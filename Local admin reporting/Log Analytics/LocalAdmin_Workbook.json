@@ -1,0 +1,62 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Devices with local admin accounts\n---\nThis report lists devices that have local admin accounts.\nIf some accounts are authorized, they won't be listed.\nSee below some authorized accounts:\n- Administrator account\n- Azure AD role: Global administrator\n- Azure AD role: Azure AD Joined Device Local Administrator Azure AD",
+        "style": "info"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LocalAdminReport_CL\n| summarize LocalAdminReport_CL = count() by LocalAdminStatus_s",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "NoAdmin",
+              "label": "Devices without local admin",
+              "color": "green"
+            },
+            {
+              "seriesName": "AdminFound",
+              "label": "Devices with local admin",
+              "color": "redBright"
+            }
+          ]
+        }
+      },
+      "name": "query - 2",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LocalAdminReport_CL\r\n| where LocalAdminStatus_s == \"AdminFound\"\r\n| project Computer=ComputerName_s,Model=Model_s,User=UserEmail_s, \r\n['Local admin found']=LocalAdminCount_d, ['Local admin account(s)']=LocalAdmin_s",
+        "size": 4,
+        "title": "Devices with local admin account(s)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
