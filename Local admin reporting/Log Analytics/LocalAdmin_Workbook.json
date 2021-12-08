@@ -45,7 +45,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LocalAdminReport_CL\r\n| where LocalAdminStatus_s == \"AdminFound\"\r\n| project Computer=ComputerName_s,Model=Model_s,User=UserEmail_s, \r\n['Local admin found']=LocalAdminCount_d, ['Local admin account(s)']=LocalAdmin_s",
+        "query": "LocalAdminReport_CL\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where LocalAdminStatus_s == \"AdminFound\"\r\n| project Computer=ComputerName_s,Model=Model_s,User=UserEmail_s, \r\n['Local admin found']=LocalAdminCount_d, ['Local admin account(s)']=LocalAdmin_s",		
         "size": 4,
         "title": "Devices with local admin account(s)",
         "timeContext": {
