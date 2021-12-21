@@ -101,13 +101,13 @@ foreach($Member in $Get_Local_AdminGroup_Members)
 			$Convert_User_to_SID = (New-Object System.Security.Principal.NTAccount("$Other_Local_Admin")).Translate([System.Security.Principal.SecurityIdentifier]).value			
 
 			$Local_admin_found++
-			$Get_LocalAdmin_Event = Get-EventLog Security -InstanceId 4732 -ea silentlycontinue | Where-Object {(($_.Message -like "*Administrateurs*") -and ($_.Message -like "*$Convert_User_to_SID*"))}
+			$Get_LocalAdmin_Event = Get-EventLog Security -InstanceId 4732 -ea silentlycontinue | Where-Object {(($_.Message -like "*$Get_Local_AdminGroup_Name*") -and ($_.Message -like "*$Convert_User_to_SID*"))}
 			If($Get_LocalAdmin_Event -ne $null)
 				{
 					$Get_LocalAdmin_Event_Date = $Get_LocalAdmin_Event.TimeGenerated
 					$Get_LocalAdmin_Event_message = $Get_LocalAdmin_Event.message
 
-					$Event_Message = ((($Get_LocalAdmin_Event_message -split "`n").trim() | select-string -pattern "nom")[0])
+					$Event_Message = ((($Get_LocalAdmin_Event_message -split "`n").trim() | select-string -pattern "account")[0])
 					$Event_Message = $Event_Message.ToString()
 					$Added_by = $Event_Message.split(":")[1].Trim()
 
