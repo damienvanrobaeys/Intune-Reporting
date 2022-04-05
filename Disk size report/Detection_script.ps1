@@ -1,12 +1,12 @@
 ï»¿#***************************************** Part to fill ***************************************************
 # Log analytics part
-$ResourceGroup = "rgp-grt-dwpprd-telemetry"
-$WorkspaceName = "GRT-EVT"
-$CustomerId = "7a3c2110-2a68-45a0-aff1-0e7b3cecd801"
-$SharedKey = 'Xj7/qbO8xat8jZVNGZdO2SO3Ghw38xRtYVljTCMioGrvIxu09N5DyEi+U9fQAD0kRA3nTfnxUM1uNgOPoLNYTg=='
+$ResourceGroup = ""
+$WorkspaceName = ""
+$CustomerId = ""
+$SharedKey = ''
 $LogType = "DiskSize"
 $TimeStampField = ""
-$SubscriptionID = "7f1fffa6-e07a-446b-bd04-d960d202cca2"
+$SubscriptionID = ""
 #***********************************************************************************************************
 
 # Log analytics functions
