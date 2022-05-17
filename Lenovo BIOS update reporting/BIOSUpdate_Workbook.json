@@ -49,7 +49,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
+            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -291,10 +291,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ChassisType_s <> \"\"\r\n| distinct ChassisType_s\r\n",
-            "value": [
-              "value::all"
-            ],
+            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ChassisType_s <> \"\"\r\n| distinct ChassisType_s\r\n",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -317,10 +314,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
-            "value": [
-              "value::all"
-            ],
+            "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
