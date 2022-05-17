@@ -79,7 +79,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| summarize GRT_BIOSUpate_CL = count() by BIOSUpToDate_s, ModelFamilyName_s, ChassisType_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n\r\n\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize GRT_BIOSUpate_CL = count() by BIOSUpToDate_s, ModelFamilyName_s, ChassisType_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n\r\n\r\n\r\n",
         "size": 4,
         "title": "BIOS update status",
         "timeContext": {
@@ -117,7 +117,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize GRT_BIOSUpate_CL = count() by ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize GRT_BIOSUpate_CL = count() by ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
         "size": 4,
         "title": "Devices with BIOS not uptodate (per model)",
         "timeContext": {
@@ -162,7 +162,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where DateDiffDelay_s <> \"\"\r\n| where DateDiffDelay_s <> \"730\"\r\n| where DateDiffDelay_s <> \"1_365\"\r\n| summarize GRT_BIOSUpate_CL = count() by DateDiffDelay_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where DateDiffDelay_s <> \"\"\r\n| where DateDiffDelay_s <> \"730\"\r\n| where DateDiffDelay_s <> \"1_365\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize GRT_BIOSUpate_CL = count() by DateDiffDelay_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
         "size": 4,
         "title": "Devices with BIOS not updated since",
         "timeContext": {
@@ -210,7 +210,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ChassisType_s <> \"\"\r\n| summarize GRT_BIOSUpate_CL = count() by ChassisType_s\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ChassisType_s <> \"\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize GRT_BIOSUpate_CL = count() by ChassisType_s\r\n",
         "size": 4,
         "title": "Devices with BIOS not uptodate (per chassis)",
         "timeContext": {
@@ -234,7 +234,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where BIOSVersionModel_s <> \"\"\r\n| summarize GRT_BIOSUpate_CL = count() by BIOSVersionModel_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where BIOSVersionModel_s <> \"\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize GRT_BIOSUpate_CL = count() by BIOSVersionModel_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
         "size": 4,
         "title": "Devices count per BIOS version",
         "timeContext": {
@@ -360,7 +360,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL | top 10 by NotUpdatedSince_d desc nulls last\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| project ['Last contact']=TimeGenerated, ['Not updated since (in days']=NotUpdatedSince_d, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL | top 10 by NotUpdatedSince_d desc nulls last\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['Last contact']=TimeGenerated, ['Not updated since (in days']=NotUpdatedSince_d, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n\r\n",
         "size": 4,
         "title": "Top 10 devices with old BIOS",
         "timeContext": {
@@ -387,7 +387,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| project ['BIOS state ?']=BIOSUpToDate_s, Computer=ComputerName_s, Chassis=ChassisType_s, User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n\r\n\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['BIOS state ?']=BIOSUpToDate_s, Computer=ComputerName_s, Chassis=ChassisType_s, User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n\r\n\r\n",
         "size": 4,
         "title": "BIOS update details (uptodate and not uptodate)",
         "timeContext": {
@@ -443,7 +443,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| project Computer=ComputerName_s,User=UserName_s, Chassis=ChassisType_s,\r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project Computer=ComputerName_s,User=UserName_s, Chassis=ChassisType_s,\r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
         "size": 4,
         "title": "Devices with BIOS not uptodate",
         "timeContext": {
@@ -470,7 +470,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where NotUpdatedSince_d > 730\r\n| project ['BIOS uptodate ?']=BIOSUpToDate_s, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
+        "query": "GRT_BIOSUpate_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where NotUpdatedSince_d > 730\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['BIOS uptodate ?']=BIOSUpToDate_s, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
         "size": 4,
         "title": "Devices with BIOS > 2 years",
         "timeContext": {
