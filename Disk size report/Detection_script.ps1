@@ -1,12 +1,9 @@
-ï»¿#***************************************** Part to fill ***************************************************
+#***************************************** Part to fill ***************************************************
 # Log analytics part
-$ResourceGroup = ""
-$WorkspaceName = ""
 $CustomerId = ""
 $SharedKey = ''
 $LogType = "DiskSize"
 $TimeStampField = ""
-$SubscriptionID = ""
 #***********************************************************************************************************
 
 # Log analytics functions
@@ -151,6 +148,18 @@ Function OD_SizeOnDisk
 			}
 	}
 	
+# Get computer model
+$WMI_computersystem = gwmi win32_computersystem
+$Manufacturer = $WMI_computersystem.manufacturer
+If($Manufacturer -eq "lenovo")
+	{
+		$Get_Current_Model = $WMI_computersystem.SystemFamily.split(" ")[1]			
+	}
+Else
+	{
+		$Get_Current_Model = $WMI_computersystem.Model		
+	}	
+	
 
 # Get Hard disk size info
 $Win32_LogicalDisk = Get-ciminstance Win32_LogicalDisk | where {$_.DeviceID -eq "C:"}
@@ -184,6 +193,9 @@ $Log_Analytics_Disk_Size = (OD_SizeOnDisk -Folder_to_check $Disk_Full_Size)
 $Log_Analytics_Disk_Size = ([System.Math]::Round(($Disk_Full_Size) / 1MB, 2))
 $Log_Analytics_Disk_FreeSpace = ([System.Math]::Round(($Disk_Free_Space) / 1MB, 2))
 
+# Get Recycle bin size
+$Recycle_Bin_Size = (Get-ChildItem -LiteralPath 'C:\$Recycle.Bin' -File -Force -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+$Global:RecycleBin_size_Percent = '{0:N0}' -f (($Recycle_Bin_Size / $Disk_Full_Size * 100),1)	
 
 # Get OneDrive full size and size on disk
 $OD_Path = (Get-ItemProperty "HKCU:\SOFTWARE\Microsoft\OneDrive\Accounts\Business1").UserFolder
@@ -365,13 +377,18 @@ $Properties = [Ordered] @{
     "HardDiskFreeSpacePercent" = $Free_Space_percent
     "DiskFreeSpaceState"       = $Disk_FreeSpace_State	
     "ODUsedSizePercent"        = $ODUsedSpaceOnDisk		
-    "OneDriveUseSizeState"     = $OneDrive_UseSize_State			
+    "OneDriveUseSizeState"     = $OneDrive_UseSize_State
+    "RecycleBinSize"    	   = $Recycle_Bin_Size			
+    "RecycleBinSizePercent"    = $RecycleBin_size_Percent	
+    "DeviceModel"   		   = $Get_Current_Model				
     "Top10UsersFolder"         = $Folders_In_Users	
     "Top10CurrentUserFolder"   = $Folders_In_UserProfile			
     "Top10CFolder"             = $Folders_In_C			
 }
-
 $ODSize = New-Object -TypeName "PSObject" -Property $Properties
+
+
+
 
 write-output $ODSize
 
