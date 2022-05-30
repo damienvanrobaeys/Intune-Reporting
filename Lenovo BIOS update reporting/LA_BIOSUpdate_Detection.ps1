@@ -1,6 +1,6 @@
 $CustomerId = "" # Log Analytics Workspace ID
 $SharedKey = '' # Log Analytics Workspace Primary Key
-$LogType = "BIOSUpate_Report" # Custom log to create in lo Analytics
+$LogType = "BIOSUpdate_Report" # Custom log to create in lo Analytics
 $TimeStampField = "" # let to blank
 #*******************************************************************************
 
@@ -51,6 +51,9 @@ Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType)
     $response = Invoke-WebRequest -Uri $uri -Method $method -ContentType $contentType -Headers $headers -Body $body -UseBasicParsing
     return $response.StatusCode
 }
+
+$SerialNumber = $((Get-WmiObject -Class Win32_BIOS).SerialNumber).Trim()
+$CurrentOS = $((Get-WmiObject -Class Win32_OperatingSystem).Caption).Trim()
 
 $WMI_computersystem = gwmi win32_computersystem
 $Manufacturer = $WMI_computersystem.manufacturer
@@ -377,6 +380,8 @@ $Properties = [Ordered] @{
     "BIOSUpToDate"            = $BIOS_UpToDate
     "ComputerName"            = $env:computername
     "UserName"                = $username
+    "SerialNumber"            = $SerialNumber	
+    "CurrentOS"            	  = $CurrentOS		
     "ModelMTM"                = ((gwmi win32_computersystem).Model).Substring(0,4)
     "ModelFamilyName"         = $Get_Current_Model_FamilyName
 	"BIOSCurrentVersion"      = $Get_Current_BIOS_Version	
