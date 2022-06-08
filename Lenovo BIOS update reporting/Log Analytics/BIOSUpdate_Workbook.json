@@ -1,0 +1,492 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## BIOS update report (for Lenovo devices)\n---\nThis workbook allows you to know:\n- BIOS update status\n- BIOS versions details on devices\n- Devices with old BIOS versions\n- Old BIOS versions per model & top 10 devices\n- Devices with BIOS older than 2 years\n- What take more space on those devices",
+        "style": "info"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "ef98ebf8-d9ea-4fcc-9343-d0b899befe11",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "BIOS update resume",
+            "subTarget": "Resume",
+            "style": "link"
+          },
+          {
+            "id": "8daa7834-d107-4833-8706-8bd32021de8a",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "BIOS update details",
+            "subTarget": "Details",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 6"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "f7c6d0d9-f0a4-4d39-ba28-fd800994b5ca",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerModel",
+            "label": "Filter on device model",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "parameters - 12"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize BIOSUpdate_Report_CL = count() by BIOSUpToDate_s, ModelFamilyName_s, ChassisType_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n\r\n\r\n\r\n",
+        "size": 4,
+        "title": "BIOS update status",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "No",
+              "label": "Not uptodate",
+              "color": "redBright"
+            },
+            {
+              "seriesName": "Yes",
+              "label": "Uptodate",
+              "color": "green"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 2",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize BIOSUpdate_Report_CL = count() by ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not uptodate (per model)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ModelFamilyName_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "BIOSUpdate_Report_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where DateDiffDelay_s <> \"\"\r\n| where DateDiffDelay_s <> \"730\"\r\n| where DateDiffDelay_s <> \"1_365\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize BIOSUpdate_Report_CL = count() by DateDiffDelay_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not updated since",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "1_180",
+              "label": "< 180 days",
+              "color": "green"
+            },
+            {
+              "seriesName": "365_730",
+              "label": "Between 1 and 2 years",
+              "color": "orange"
+            },
+            {
+              "seriesName": "730_More",
+              "label": "> 2 years",
+              "color": "redBright"
+            },
+            {
+              "seriesName": "180_365",
+              "label": "< 1 year",
+              "color": "blue"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 8",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where ChassisType_s <> \"\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize BIOSUpdate_Report_CL = count() by ChassisType_s\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not uptodate (per chassis)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 10",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where BIOSVersionModel_s <> \"\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| summarize BIOSUpdate_Report_CL = count() by BIOSVersionModel_s, ModelFamilyName_s\r\n| where ModelFamilyName_s has_any ({ComputerModel})\r\n",
+        "size": 4,
+        "title": "Devices count per BIOS version",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "BIOSVersionModel_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "BIOSUpdate_Report_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          },
+          "showBorder": false
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 9",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "a44a4ce2-9e2c-4d9c-b014-02da3520c002",
+            "version": "KqlParameterItem/1.0",
+            "name": "ChassisType",
+            "label": "Filter on chassis",
+            "type": 2,
+            "description": "Filter devices on chassis: laptop or desktop",
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ChassisType_s <> \"\"\r\n| distinct ChassisType_s\r\n",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "id": "3510d378-4927-4f9e-a6f6-61cfb0636485",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerModel",
+            "label": "Filter on model",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where ModelFamilyName_s <> \"\"\r\n| distinct ModelFamilyName_s",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "id": "2ddd8ba4-0deb-4a65-af34-86013eee4377",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Type a device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "parameters - 11"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL | top 10 by NotUpdatedSince_d desc nulls last\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['Last contact']=TimeGenerated, ['Not updated since (in days']=NotUpdatedSince_d, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n\r\n",
+        "size": 4,
+        "title": "Top 10 devices with old BIOS",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 8",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['BIOS state ?']=BIOSUpToDate_s, Computer=ComputerName_s, Chassis=ChassisType_s, User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n\r\n\r\n",
+        "size": 4,
+        "title": "BIOS update details (uptodate and not uptodate)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "BIOS state ?",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "No",
+                    "representation": "2",
+                    "text": ""
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Yes",
+                    "representation": "success",
+                    "text": ""
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "success",
+                    "text": ""
+                  }
+                ]
+              }
+            }
+          ],
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project Computer=ComputerName_s,User=UserName_s, Chassis=ChassisType_s,\r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not uptodate",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BIOSUpdate_Report_CL\r\n| where ScriptStatus_s == \"Success\"\r\n| where BIOSUpToDate_s == \"No\"\r\n| where NotUpdatedSince_d > 730\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| project ['BIOS uptodate ?']=BIOSUpToDate_s, Computer=ComputerName_s,User=UserName_s, \r\n['Model MTM']=ModelMTM_s, Model=ModelFamilyName_s, ['Not updated since (in days']=NotUpdatedSince_d,\r\n['Current BIOS version']=BIOSCurrentVersion_s,['New BIOS version']=BIOSNewVersion_s, Chassis=ChassisType_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where Chassis has_any ({ChassisType})\r\n| where Model has_any ({ComputerModel})\r\n",
+        "size": 4,
+        "title": "Devices with BIOS > 2 years",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
