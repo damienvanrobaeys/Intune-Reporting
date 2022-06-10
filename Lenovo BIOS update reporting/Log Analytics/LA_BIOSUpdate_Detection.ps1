@@ -364,7 +364,7 @@ $BIOS_Ver_Model = "$Get_Current_BIOS_Version ($Get_Current_Model_FamilyName)"
 
 $Chassis = (Get-CimInstance -ClassName Win32_SystemEnclosure).ChassisTypes
 $Device_Chassis = [string]$chassis
-If($Chassis -eq 9 -or $Chassis -eq 10 -or $Chassis -eq 14) 
+If($Chassis -eq 9 -or $Chassis -eq 10 -or $Chassis -eq 14 -or $Chassis -eq 8 -or $Chassis -eq 11 -or $Chassis -eq 12 -or $Chassis -eq 18 -or $Chassis -eq 21 -or $Chassis -eq 31 -or $Chassis -eq 32) 
 	{
 		$Chassis_Type = "Laptop"
 	}
