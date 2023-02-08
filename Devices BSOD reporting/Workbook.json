@@ -1,0 +1,629 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## BSOD details during last 30 days\n---\nThis report lists all BSOD occuring during last 30 days on all devices/\n\nTwo tabs are available:<br>\n1. BSOD resume: BSOD count per elements (date, model, BIOS version...)\n2. BSOD details: details about devices\n\n\n**&#9888; Note :** BSOD data are updated every 6 hours<br>\n**&#9888; Note :** BSOD logs are uploaded every days on SharePoint \n\nFor more informations about BSOD code mentioned in the report, consult those links:<br>\nhttps://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/bug-check-code-reference2<br>\nhttps://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/bug-check-code-reference-live-dump ",
+        "style": "info"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "ddcc083f-c527-4e6f-92b6-4cb4c334362d",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "BSOD resume",
+            "subTarget": "Resume",
+            "style": "link"
+          },
+          {
+            "id": "fd45b72b-548a-4e7b-92f2-c1300224797d",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "BSOD details",
+            "subTarget": "Details",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 7"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "54701990-b7f1-4214-bf00-520bf78dba62",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Filter on device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ""
+          },
+          {
+            "id": "0182ae86-682b-42e6-a91e-a90bb57d48a7",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerModel",
+            "label": "Filter on models",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "BSOD_CL\r\n| summarize arg_max(TimeGenerated,*) by Model_s\r\n//| summarize BSOD_CL = count() by Model_s\r\n| where Model_s <> \"\"\r\n| distinct Model_s\r\n",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "value::all"
+            ]
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 11"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL\r\n| project Time=format_datetime(TimeGenerated, \"dd/MM/yyyy hh:mm:ss\")\r\n| summarize arg_max(Time,*) //by TimeGenerated",
+        "size": 4,
+        "title": "Last data update",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "card",
+        "tileSettings": {
+          "showBorder": false
+        },
+        "graphSettings": {
+          "type": 0
+        },
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "customWidth": "20",
+      "name": "query - 13",
+      "styleSettings": {
+        "maxWidth": "40"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL \r\n| summarize arg_max(TimeGenerated,*)\r\n| project hour=datetime_add('hour',6,make_datetime(TimeGenerated))\r\n| project Time=format_datetime(hour, \"dd/MM/yyyy hh:mm:ss\")",
+        "size": 4,
+        "title": "Next data update",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "card",
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "customWidth": "20",
+      "name": "query - 15",
+      "styleSettings": {
+        "maxWidth": "40"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL \r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| summarize Count = sum(BSODCount_d) by Model_s \r\n| order by Count",
+        "size": 1,
+        "title": "BSOD count per model",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Model_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "Count",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "style": "decimal",
+                "maximumFractionDigits": 2,
+                "maximumSignificantDigits": 3
+              }
+            }
+          },
+          "showBorder": false
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 16",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL \r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| summarize Count = sum(BSODCount_d) by FullBIOSVersion_s \r\n| order by Count",
+        "size": 1,
+        "title": "BSOD count per BIOS version",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "FullBIOSVersion_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "Count",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "style": "decimal",
+                "maximumFractionDigits": 2,
+                "maximumSignificantDigits": 3
+              }
+            }
+          },
+          "showBorder": false
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL\r\n| where BSODCount_d > 0\r\n| where Manufacturer_s <> \"\"\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| summarize BSOD_CL = count() by Manufacturer_s",
+        "size": 4,
+        "title": "BSOD count per manufacturer",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Manufacturer_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "BSOD_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "style": "decimal",
+                "maximumFractionDigits": 2,
+                "maximumSignificantDigits": 3
+              }
+            }
+          },
+          "showBorder": false
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL\r\n| where BSODCount_d > 0\r\n| where OSVersion_s <> \"\"\r\n| where Model_s has_any ({ComputerModel})\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| summarize BSOD_CL = count() by OSVersion_s",
+        "size": 1,
+        "title": "BSOD count per OS",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "OSVersion_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "BSOD_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 6",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Count of last BSOD on devices per date",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "4f7d8d86-05ae-402d-bd47-3c3ca91bd9e4",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "TimeRange",
+                  "label": "Selected a time range",
+                  "type": 4,
+                  "typeSettings": {
+                    "selectableValues": [
+                      {
+                        "durationMs": 3600000
+                      },
+                      {
+                        "durationMs": 14400000
+                      },
+                      {
+                        "durationMs": 43200000
+                      },
+                      {
+                        "durationMs": 86400000
+                      },
+                      {
+                        "durationMs": 172800000
+                      },
+                      {
+                        "durationMs": 259200000
+                      },
+                      {
+                        "durationMs": 604800000
+                      },
+                      {
+                        "durationMs": 1209600000
+                      },
+                      {
+                        "durationMs": 2419200000
+                      },
+                      {
+                        "durationMs": 2592000000
+                      }
+                    ]
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": {
+                    "durationMs": 2592000000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "parameters - 16"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "BSOD_CL\r\n| where BSODCount_d > 0\r\n| where LastBSOD_t <> \"\"\r\n//| where Model_s has_any ({ComputerModel})\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| where LastBSOD_t {TimeRange}\r\n//| project FormatedDate=format_datetime (LastBSOD_t,\"dd-MM-yyyy\"), Device_s\r\n| project FormatedDate=format_datetime (LastBSOD_t,\"MM-dd-yyyy\"), Device_s\r\n| summarize BSOD_CL = count() by FormatedDate\r\n| sort by FormatedDate asc\r\n",
+              "size": 0,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "categoricalbar",
+              "gridSettings": {
+                "sortBy": [
+                  {
+                    "itemKey": "FormatedDate",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "FormatedDate",
+                  "sortOrder": 2
+                }
+              ],
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "FormatedDate",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "BSOD_CL",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 8"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "group - 16",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_Details_CL\r\n| summarize arg_max(TimeGenerated,*) by AllBSODDate_t\r\n| summarize Count = count() by AllBSODCode_s, AllBSODCodeInfo_s\r\n| project-rename ['BSOD code']=AllBSODCode_s, ['Code info']=AllBSODCodeInfo_s\r\n| order by Count",
+        "size": 1,
+        "title": "BSOD count per error code",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 15",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_Details_CL\r\n| summarize arg_max(TimeGenerated,*) by AllBSODDate_t\r\n//| project Device_s, AllBSODDate_t, AllBSODCode_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Device_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=Device_s,Date=AllBSODDate_t, Code=AllBSODCode_s, ['Code info']=AllBSODCodeInfo_s\r\n| order by Date",
+        "size": 1,
+        "title": "BSOD for a specific device during last 30 days (type a name)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 5000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 10",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL \r\n//| where BSODLogFile_s <> \"No logs\" and BSODLogFile_s <> \"\"\r\n| where  BSODLogFileDate_t <> \"\" and BSODLogFile_s <> \"No logs\" and BSODLogFileDate_t <> \"\"\r\n| where Model_s has_any ({ComputerModel})\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| where \"{ComputerName:escape}\" == \"*\" or Device_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=Device_s,Model=Model_s,['Last BSOD date']=LastBSOD_t,['Last BSOD code']=LastCode_s,['Code info']=LastCodeInfo_s,Logs=BSODLogFile_s,['Log date']=BSODLogFileDate_t\r\n",
+        "size": 1,
+        "title": "Link to devices logs (on last 15 days)  ",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 2000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 12",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL \r\n//| summarize arg_max(TimeGenerated,*) by BSODCount_d\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| top 30 by BSODCount_d desc nulls last\r\n| project ['Last BSOD date']=LastBSOD_t, Computer=Device_s,['BSOD count']=BSODCount_d,Model=Model_s,['Last BSOD code']=LastCode_s,['Code info']=LastCodeInfo_s,['BIOS version']=FullBIOSVersion_s,Manufacturer=Manufacturer_s",
+        "size": 1,
+        "title": "Top 10 devices with BSOD",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "sortBy": []
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "BSOD_CL\r\n| where AllBSOD_s <> \"\"\r\n| where Device_s <> \"\"\r\n| where BSODCount_d <> 0\r\n| summarize arg_max(TimeGenerated,*) by Device_s\r\n| where Model_s has_any ({ComputerModel})\r\n| project-rename DeviceId=IntuneID_g\r\n| project-away TenantId, SourceSystem,MG,ManagementGroupName,RawData,_ResourceId\r\n| join IntuneDevices on DeviceId\r\n| project-away TenantId, SourceSystem,OperationName,Result,Type //,TimeGenerated\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n//| order by BSODCount_d desc\r\n| project Computer=DeviceName, Model=Model_s, ['BSOD count']=BSODCount_d,['Last BSOD date']=LastBSOD_t,['Last BSOD code']=LastCode_s,['Code info']=LastCodeInfo_s,['BIOS version']=FullBIOSVersion_s,Manufacturer,OS=OSVersion,['Last contact']=LastContact,SN=SerialNumber,User=UserName,['Taille totale du disque']=StorageTotal,['Espace disque libre']=StorageFree\r\n| where \"{ComputerName:escape}\" == \"*\" or Computer contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n//| where Model has_any ({ComputerModel})\r\n\r\n",
+        "size": 0,
+        "title": "Devices details",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Taille totale du disque",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 4,
+                "options": {
+                  "style": "decimal"
+                }
+              }
+            },
+            {
+              "columnMatch": "Espace disque libre",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 4,
+                "options": {
+                  "style": "decimal"
+                }
+              }
+            },
+            {
+              "columnMatch": "StorageTotal",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 4,
+                "options": {
+                  "style": "decimal"
+                }
+              }
+            },
+            {
+              "columnMatch": "StorageFree",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 4,
+                "options": {
+                  "style": "decimal"
+                }
+              }
+            }
+          ],
+          "rowLimit": 2000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
