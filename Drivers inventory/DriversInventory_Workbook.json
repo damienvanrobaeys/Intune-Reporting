@@ -1,0 +1,621 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Drivers details (not Microsoft) installed on devices\n---\nThis report lists all drivers (not Microsoft) installed on all Intune devices. \nTwo tabs are available:\n1. Resume: count of drivers by elements\n2. Details: details of drivers on devices\n\nFor a better result, filter by device name, model, manufacturer or class",
+        "style": "info"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "7306945e-f473-4406-8078-18030df08a5c",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Drivers resume",
+            "subTarget": "Resume",
+            "style": "link"
+          },
+          {
+            "id": "26df46c8-3fad-483f-99a8-29e1256a1234",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Drivers details",
+            "subTarget": "Details",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 10"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "e0e1621b-3ab7-4dee-acae-23b8913115be",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Filter by device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ""
+          },
+          {
+            "id": "2f555298-3186-403d-8c96-045327b05f54",
+            "version": "KqlParameterItem/1.0",
+            "name": "Models",
+            "label": "Filter by models",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "DriversInventory_CL\r\n| where isnotempty(ModelFriendlyName_s)\r\n| distinct ModelFriendlyName_s\r\n",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "value::all"
+            ]
+          },
+          {
+            "id": "97f9cc24-1198-4088-b212-0e146b1ccac2",
+            "version": "KqlParameterItem/1.0",
+            "name": "Manufacturers",
+            "label": "Filter by manufacturer",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "DriversInventory_CL\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n//| summarize DriversInventory_CL = count() by manufacturer_s\r\n| distinct DeviceManufacturer_s",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "id": "280b8f46-bcff-4206-b848-372861c5f90a",
+            "version": "KqlParameterItem/1.0",
+            "name": "Class",
+            "label": "Filter by class",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "DriversInventory_CL\r\n| where isnotempty(DeviceClass_s)\r\n| distinct DeviceClass_s\r\n",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "value::all"
+            ]
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL \r\n| where isnotempty(DeviceName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| count\r\n",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1} postes"
+                  }
+                ],
+                "customColumnWidthSetting": "20%"
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Count",
+              "label": "Devices inventoried"
+            }
+          ]
+        },
+        "mapSettings": {
+          "locInfo": "LatLong",
+          "sizeSettings": "Count",
+          "sizeAggregation": "Sum",
+          "legendMetric": "Count",
+          "legendAggregation": "Sum",
+          "itemColorSettings": {
+            "type": "heatmap",
+            "colorAggregation": "Sum",
+            "nodeColorField": "Count",
+            "heatmapPalette": "greenRed"
+          }
+        },
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "25",
+      "name": "query - 3",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL \r\n| where isnotempty(ModelFriendlyName_s)\r\n| summarize arg_max(TimeGenerated,*) by ModelFriendlyName_s\r\n| project ModelFriendlyName_s\r\n| count\r\n",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1} modèles"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Count",
+              "label": "Models inventoried"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "25",
+      "name": "query - 11",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL \r\n| where isnotempty(DeviceManufacturer_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceManufacturer_s\r\n| project DeviceManufacturer_s\r\n| count",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1} constructeurs"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Count",
+              "label": "Manufacturers inventoried"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "25",
+      "name": "query - 11",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| summarize DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by DriversInventory_CL",
+        "size": 1,
+        "title": "Devices count per models",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ModelFriendlyName_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "DriversInventory_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 10",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| summarize DriversInventory_CL = count() by DriverName_s, DriverVersion_s\r\n| order by DriversInventory_CL\r\n| project ['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Devices count']=DriversInventory_CL\r\n",
+        "size": 1,
+        "title": "Devices count per drivers version",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "rowLimit": 1000,
+          "filter": true
+        },
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "DriverName_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "DriversInventory_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 7",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated, Device=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s,DeviceID=DeviceID_s,Constructeur=manufacturer_s\r\n",
+        "size": 0,
+        "title": "Full details",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 1000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n\r\n",
+        "size": 1,
+        "title": "Drivers installed per models",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 1000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 9",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
+        "size": 0,
+        "title": "Drivers > 2 years (filter by device name)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "rowLimit": 1000,
+          "filter": true
+        },
+        "sortBy": [],
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "DeviceName_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "DriversInventory_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by DriversInventory_CL",
+        "size": 1,
+        "title": "Devices with drivers > 2 years",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ModelFriendlyName_s",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "DriversInventory_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 8",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DeviceClass_s has_any ({Class})\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize DriversInventory_CL = count() by  DriverName_s\r\n| order by DriversInventory_CL\r\n| project Driver=DriverName_s",
+        "size": 0,
+        "title": "Older drivers (> 2 years)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 12",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"DISPLAY\"// or DeviceClass_s contains \"MONITOR\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s\r\n",
+        "size": 1,
+        "title": "List of graphics drivers per models",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 1000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 13",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"NET\" or DeviceClass_s contains \"NetClient\" or DeviceClass_s contains \"NetService\" or DeviceClass_s contains \"Infrared\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s, Class=DeviceClass_s\r\n",
+        "size": 0,
+        "title": "List of network drivers per models",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 14",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
