@@ -1,7 +1,13 @@
-$Custom_Logs = "Export_DiscoveredApps"
+#$Custom_Logs = "Export_DiscoveredApps"
 $CustomerId = "" # Log Analytics Workspace ID
 $SharedKey = '' # Log Analytics Workspace Primary Key
 $TimeStampField = ""
+$Custom_log = "Intune_DiscoveredApps"
+
+$ClientID = ""
+$Secret = ''    
+$Site_URL = ""
+$Folder_Location = ""
 
 # Log analytics functions
 Function Build-Signature ($customerId, $sharedKey, $date, $contentLength, $method, $contentType, $resource)
@@ -49,24 +55,16 @@ Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType)
     return $response.StatusCode
 }
 
-# SHAREPOINT APPLICATION PART
-$ClientID = "" # SHAREPOINT APP CLIENT ID
-$Secret = '' # SHAREPOINT APP CLIENT SECRET
-$Site_URL = "" # SHAREPOINT SITE
-$Folder_Location = "" # SHAREPOINT FOLDER WHERE TO SEND CSV
-
-# CONNECT TO SHAREPOINT
 Connect-PnPOnline -Url $Site_URL -ClientId $ClientID -ClientSecret $Secret -WarningAction Ignore
 
-# GET DISCOVEREDAPPS CSV FROM SHAREPOINT
-$Get_WindowsApps_CSV = Get-PnPFolderItem -FolderSiteRelativeUrl "Documents partages/Windows/Apps_Report" | where {$_.Name -like "*_Windows.csv*"}
+$Get_WindowsApps_CSV = Get-PnPFolderItem -FolderSiteRelativeUrl "Documents partages/Windows/Apps_Report" | where {$_.Name -like "DiscoveredApps_Windows.csv*"}
+
 $CSV_URL = $Get_WindowsApps_CSV.ServerRelativeUrl
 Get-PnPFile -Url $CSV_URL -Path $env:temp -FileName "DiscoveredApps_Windows.csv" -AsFile -Force
 $File_Path = "$env:temp\DiscoveredApps_Windows.csv"
-$InputFilename = Get-Content $File_Path
 
-# SPLIT FILE IN MULTIPLE CSV
-# Special thank for this: https://www.spjeff.com/2017/06/02/powershell-split-csv-in-1000-line-batches/
+$InputFilename = [System.IO.File]::ReadAllLines($File_Path)
+
 $OutputFilenamePattern = ".\Export_"
 $LineLimit = 1000
 $line = 0
@@ -86,22 +84,18 @@ While ($line -le $InputFilename.Length){
 			$Get_CSV_FirstLine = Get-Content $CSV_File | Select -First 1
 			$Get_Delimiter = If($Get_CSV_FirstLine.Split(";").Length -gt 1){";"}Else{","};			
 			$LA_CSV = import-csv $CSV_File -Delimiter $Get_Delimiter	
-
-			# CONVERT EACH CSV TO JSON
+                 
 			$InfoToImport_Json = $LA_CSV | ConvertTo-Json
 			$params = @{
 				CustomerId = $customerId
 				SharedKey  = $sharedKey
 				Body       = ([System.Text.Encoding]::UTF8.GetBytes($InfoToImport_Json))
-				LogType    = "DiscoveredApps" 
+				LogType    = $Custom_log 
 			}
-
-			# SEND CSV CONTENT TO LOG ANALYTICS			
 			$LogResponse = Post-LogAnalyticsData @params
-
+                      
 			$CSV_File
-
-			write-host "Memory used after full collection: $([System.GC]::GetTotalMemory($true))"
+            [System.GC]::GetTotalMemory($true) | out-null
 		}
 	$i++;
 	$line++
