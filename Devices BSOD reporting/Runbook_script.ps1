@@ -6,9 +6,14 @@ Mail: damien.vanrobaeys@gmail.com
 #>
 
 #*****************************************************************
-<#
-Info to fill
+# Info to fill
 
+# Info about your Log Analytics workspace
+$CustomerId = "" # Log Analytics Workspace ID
+$SharedKey = '' # Log Analytics Workspace Primary Key
+$TimeStampField = ""
+
+<#
 Specify if you want to get BSOD log info
 For this you need to configure a Proactive Remediation, see below:
 https://www.systanddeploy.com/2022/03/proactive-remediation-detect-devices.html
@@ -21,11 +26,6 @@ $Secret = ''
 $Site_URL = ""
 $Folder_Location = ""
 $Log_File_Path = "" 
-
-# Info about your LOg Analytics workspace
-$CustomerId = "" # Log Analytics Workspace ID
-$SharedKey = '' # Log Analytics Workspace Primary Key
-$TimeStampField = ""
 
 # Info to fill
 #*****************************************************************
@@ -95,11 +95,17 @@ If($Use_SharePoint_Logs -eq $True)
     }
 
 # Getting all Lenovo models info
-$URL = "https://download.lenovo.com/bsco/schemas/list.conf.txt"
-$Get_Web_Content = Invoke-RestMethod -Uri $URL -Method GET
-$Get_Models = $Get_Web_Content -split "`r`n"
+# There we will convert models provided from Lenovo as MTM to friendly name
+# more info here: https://www.systanddeploy.com/2023/01/get-list-uptodate-of-all-lenovo-models.html
+# $URL = "https://download.lenovo.com/bsco/schemas/list.conf.txt"
+# $Get_Web_Content = Invoke-RestMethod -Uri $URL -Method GET
+# $Get_Models = $Get_Web_Content -split "`r`n"
+
+$URL = "https://download.lenovo.com/bsco/public/allModels.json"
+$Get_Models = Invoke-RestMethod -Uri $URL -Method GET
 
 # Convert BSOD code to a description
+# There we will convert BSOD codes to something more understanble, a bit more
 $BugCheck_Reference = @{}
 $BugCheck_Reference = @{
     "0x00000001" = "APC_INDEX_MISMATCH"
@@ -471,12 +477,13 @@ $BugCheck_Reference = @{
 $Error_code = $BugCheck_Reference.GetEnumerator() | Select-Object -Property Key,Value 
 
 
-# Graph URL to use
+# Graph URL to use to list all BSOD
 $BSOD_URL = "https://graph.microsoft.com/beta/deviceManagement/userExperienceAnalyticsDevicePerformance?dtFilter=all&`$orderBy=blueScreenCount%20desc&`$filter=blueScreenCount%20ge%201%20and%20blueScreenCount%20le%20500"
 $All_BSOD = Invoke-WebRequest -Uri $BSOD_URL -Method GET -Headers $Headers -UseBasicParsing 
 $All_BSOD_JsonResponse = ($All_BSOD.Content | ConvertFrom-Json)
 $Get_All_BSOD = $All_BSOD_JsonResponse.value
 
+# We will parse all pages
 If($All_BSOD_JsonResponse.'@odata.nextLink')
 {
     do {
@@ -499,6 +506,8 @@ ForEach($BSOD in $Get_All_BSOD)
         $Manufacturer = $BSOD.manufacturer
         $restartCount = $BSOD.restartCount
 
+
+		# If we choose to get logs from SharePoint, we will check if there is a file on SharePoint corresponding to the device name
         If($Use_SharePoint_Logs -eq $True)
             {
                 $BSOD_File_Name = "BSOD_$Device_Name.zip"
@@ -518,11 +527,16 @@ ForEach($BSOD in $Get_All_BSOD)
        
         If($Manufacturer -eq "lenovo")
             {
+                # $Model_MTM = $Device_Model.Substring(0,4)                            
+                # $Current_Model = $Get_Models | where-object { $_ -like "*$Model_MTM*"}
+                # $Device_Model = ($Current_Model.split("("))[0]
+				
                 $Model_MTM = $Device_Model.Substring(0,4)                            
-                $Current_Model = $Get_Models | where-object { $_ -like "*$Model_MTM*"}
-                $Device_Model = ($Current_Model.split("("))[0]
+                $Current_Model = ($Get_Models | where-object {($_ -like "*$Model_MTM*") -and ($_ -notlike "*-UEFI Lenovo*") -and ($_ -notlike "*dTPM*") -and ($_ -notlike "*Asset*") -and ($_ -notlike "*fTPM*")})[0]
+                $Device_Model = ($Current_Model.name.split("("))[0]         				
             }
 
+		# There we will get all BSOD for all device
 		$StartupHistory_url = "https://graph.microsoft.com/beta/deviceManagement/userExperienceAnalyticsDeviceStartupHistory?" + '$filter=deviceId%20eq%20%27' + "$DeviceID%27"				
         $Get_StartupHistory = Invoke-WebRequest -Uri $StartupHistory_url -Method GET -Headers $Headers -UseBasicParsing 
         $Get_BSOD_JsonResponse = ($Get_StartupHistory.Content | ConvertFrom-Json)
@@ -621,6 +635,7 @@ ForEach($BSOD in $Get_All_BSOD)
 		$BSOD_Array += $BSOD_Obj       
 	}
 
+# There we will send all info to Log Analytics
 $BSOD_Json = $BSOD_Array | ConvertTo-Json
 $params = @{
 	CustomerId = $customerId
