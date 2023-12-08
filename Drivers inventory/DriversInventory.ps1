@@ -21,7 +21,6 @@ Function Build-Signature ($customerId, $sharedKey, $date, $contentLength, $metho
     return $authorization
 }
 ""
-# Create the function to create and post the request
 Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType)
 {
     $method = "POST"
@@ -50,6 +49,7 @@ Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType)
     return $response.StatusCode
 }
 
+# GET MODEL INFO
 $win32_computersystem = gwmi win32_computersystem
 $Manufacturer = $win32_computersystem.Manufacturer
 $Model = $win32_computersystem.Model
@@ -63,17 +63,20 @@ If($Manufacturer -like "*lenovo*")
 		$Get_Current_Model = $Model_FriendlyName
 	}	
 
-$PNPSigned_Drivers = gwmi Win32_PnPSignedDriver | where {($_.manufacturer -ne "microsoft") -and ($_.driverprovidername -ne "microsoft") -and`
-($_.DeviceName -ne $null)} | select-object @{Label="DeviceName";Expression={$_.PSComputerName}},`
+# COLLECT DRIVERS IN ARRAY
+$PNPSigned_Drivers = gwmi win32_PnpSignedDriver | where {($_.manufacturer -ne "microsoft") -and ($_.driverprovidername -ne "microsoft") -and`
+($_.DeviceName -ne $null)} | select-object @{Label="DeviceName";Expression={$env:computername}},`
 @{Label="ModelFriendlyName";Expression={$Model_FriendlyName}},`
 @{Label="DeviceManufacturer";Expression={$Manufacturer}},`
 @{Label="Model";Expression={$Model}},`
 @{Label="DriverName";Expression={$_.DeviceName}},DriverVersion,`
 @{Label="DriverDate";Expression={$_.ConvertToDateTime($_.DriverDate)}},`
-DeviceClass, DeviceID, manufacturer 
+DeviceClass, DeviceID, manufacturer,InfName,Location
 
+# CONVERT ARRAY TO JSON
 $Drivers_Json = $PNPSigned_Drivers | ConvertTo-Json
 
+# SEND JSON CONTENT TO LOG ANALYTICS
 $params = @{
 	CustomerId = $customerId
 	SharedKey  = $sharedKey

@@ -4,7 +4,7 @@
     {
       "type": 1,
       "content": {
-        "json": "## Drivers details (not Microsoft) installed on devices\n---\nThis report lists all drivers (not Microsoft) installed on all Intune devices. \nTwo tabs are available:\n1. Resume: count of drivers by elements\n2. Details: details of drivers on devices\n\nFor a better result, filter by device name, model, manufacturer or class",
+        "json": "## Drivers details (not Microsoft) installed on devices\n---\nThis report lists all drivers (not Microsoft) installed on all Intune devices. \nTwo tabs are available:\n1. Resume: count of drivers by elements\n2. Details: details of drivers on devices\n\nFor a better result, filter by device name, model, manufacturer or class.\n<br>\nBy filtering on device name, you will get below information for this device:\n- All drivers installed\n- Drivers older than 2 years\n- Latest drivers installed duing last 2 months\n\n\n**&#9888; Note :** Drivers inventory is updated every days<br>",
         "style": "info"
       },
       "name": "text - 2"
@@ -346,7 +346,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| summarize DriversInventory_CL = count() by DriverName_s, DriverVersion_s\r\n| order by DriversInventory_CL\r\n| project ['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Devices count']=DriversInventory_CL\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where DriverName_s notcontains \"Intel(R) Serial IO\"\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| summarize DriversInventory_CL = count() by DriverName_s, DriverVersion_s\r\n| order by DriversInventory_CL\r\n| project ['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Devices count']=DriversInventory_CL\r\n",
         "size": 1,
         "title": "Devices count per drivers version",
         "timeContext": {
@@ -356,7 +356,7 @@
         "resourceType": "microsoft.operationalinsights/workspaces",
         "visualization": "table",
         "gridSettings": {
-          "rowLimit": 1000,
+          "rowLimit": 10000,
           "filter": true
         },
         "tileSettings": {
@@ -395,9 +395,9 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated, Device=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s,DeviceID=DeviceID_s,Constructeur=manufacturer_s\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated, Device=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s,DeviceID=DeviceID_s,Constructeur=manufacturer_s\r\n| limit 1000 ",
         "size": 0,
-        "title": "Full details",
+        "title": "Full details (type device name)",
         "timeContext": {
           "durationMs": 2592000000
         },
@@ -422,7 +422,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n| limit 5000\r\n",
         "size": 1,
         "title": "Drivers installed per models",
         "timeContext": {
@@ -431,7 +431,7 @@
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "gridSettings": {
-          "rowLimit": 1000,
+          "rowLimit": 10000,
           "filter": true
         }
       },
@@ -441,6 +441,35 @@
         "value": "Details"
       },
       "name": "query - 9",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t > ago(60d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
+        "size": 1,
+        "title": "Last drivers installed for a device (last 2 months)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 15",
       "styleSettings": {
         "showBorder": true
       }
@@ -485,11 +514,17 @@
           }
         }
       },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "Details"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
       "name": "query - 4",
       "styleSettings": {
         "showBorder": true
@@ -616,6 +651,9 @@
         "showBorder": true
       }
     }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/7f1fffa6-e07a-446b-bd04-d960d202cca2/resourceGroups/rgp-grt-dwpprd-telemetry/providers/Microsoft.OperationalInsights/workspaces/GRT-EVT"
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
