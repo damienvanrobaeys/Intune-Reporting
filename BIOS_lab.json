@@ -1,0 +1,211 @@
+[
+  {
+    "ComputerName": "LP00001",
+    "UserName": "Damien",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "0",
+    "CurrentVersionBIOS": "1.21",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "uptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "0"
+  },
+  {
+    "ComputerName": "LP00002",
+    "UserName": "Kevin",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "320",
+    "CurrentVersionBIOS": "1.15",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "180_365"
+  },
+  {
+    "ComputerName": "LP00003",
+    "UserName": "Stephen",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "320",
+    "CurrentVersionBIOS": "1.15",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "180_365"
+  },
+  {
+    "ComputerName": "LP00004",
+    "UserName": "Mike",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "89",
+    "CurrentVersionBIOS": "1.19",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "1_180"
+  },
+  {
+    "ComputerName": "LP00005",
+    "UserName": "Thomas",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "0",
+    "CurrentVersionBIOS": "1.21",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "uptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "0"
+  },
+  {
+    "ComputerName": "LP00006",
+    "UserName": "Luca",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "421",
+    "CurrentVersionBIOS": "1.13",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "365_730"
+  },
+  {
+    "ComputerName": "LP00007",
+    "UserName": "Evrard",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "89",
+    "CurrentVersionBIOS": "1.19",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "1_180"
+  },
+  {
+    "ComputerName": "LP00008",
+    "UserName": "Steven",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "0",
+    "CurrentVersionBIOS": "1.21",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "uptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "0"
+  },
+  {
+    "ComputerName": "LP00009",
+    "UserName": "Pascal",
+    "DeviceModel": "T14s",
+    "NotUpdatedSince": "421",
+    "CurrentVersionBIOS": "1.13",
+    "NewVersionBIOS": "1.21",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "365_730"
+  },
+  {
+    "ComputerName": "LP00030",
+    "UserName": "Hakim",
+    "DeviceModel": "T480s",
+    "NotUpdatedSince": "0",
+    "CurrentVersionBIOS": "1.48",
+    "NewVersionBIOS": "1.48",
+    "BIOSStatus": "uptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "0"
+  },
+  {
+    "ComputerName": "LP00031",
+    "UserName": "Mathieu",
+    "DeviceModel": "T470s",
+    "NotUpdatedSince": "1333",
+    "CurrentVersionBIOS": "1.2",
+    "NewVersionBIOS": "1.41",
+    "BIOSStatus": "uptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "0"
+  },
+  {
+    "ComputerName": "LP00033",
+    "UserName": "Harjit",
+    "DeviceModel": "T470s",
+    "NotUpdatedSince": "1379",
+    "CurrentVersionBIOS": "1.17",
+    "NewVersionBIOS": "1.41",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "730_More"
+  },
+  {
+    "ComputerName": "LP00034",
+    "UserName": "Octavio",
+    "DeviceModel": "T470s",
+    "NotUpdatedSince": "1110",
+    "CurrentVersionBIOS": "1.27",
+    "NewVersionBIOS": "1.41",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "730_More"
+  },
+  {
+    "ComputerName": "LP00035",
+    "UserName": "Mattias",
+    "DeviceModel": "T460s",
+    "NotUpdatedSince": "1907",
+    "CurrentVersionBIOS": "1.15",
+    "NewVersionBIOS": "1.53",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "730_More"
+  },
+  {
+    "ComputerName": "LP00036",
+    "UserName": "Rudy",
+    "DeviceModel": "T460s",
+    "NotUpdatedSince": "703",
+    "CurrentVersionBIOS": "1.47",
+    "NewVersionBIOS": "1.53",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "365_730"
+  },
+  {
+    "ComputerName": "LP00037",
+    "UserName": "Angel",
+    "DeviceModel": "T460s",
+    "NotUpdatedSince": "2023",
+    "CurrentVersionBIOS": "1.11",
+    "NewVersionBIOS": "1.53",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "730_More"
+  },
+  {
+    "ComputerName": "LP00038",
+    "UserName": "Mara",
+    "DeviceModel": "T450s",
+    "NotUpdatedSince": "340",
+    "CurrentVersionBIOS": "1.35",
+    "NewVersionBIOS": "1.37",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "180_365"
+  },
+  {
+    "ComputerName": "LP00039",
+    "UserName": "Medhi",
+    "DeviceModel": "X260",
+    "NotUpdatedSince": "609",
+    "CurrentVersionBIOS": "1.43",
+    "NewVersionBIOS": "1.47",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "365_730"
+  },
+  {
+    "ComputerName": "LP00040",
+    "UserName": "Bruce",
+    "DeviceModel": "X260",
+    "NotUpdatedSince": "1580",
+    "CurrentVersionBIOS": "1.21",
+    "NewVersionBIOS": "1.47",
+    "BIOSStatus": "notuptodate",
+    "ScriptStatus": "Success",
+    "DateDiffDelay": "730_More"
+  }
+]
