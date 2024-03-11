@@ -4,7 +4,7 @@
     {
       "type": 1,
       "content": {
-        "json": "## Devices with local admin accounts\n---\nThis report lists devices that have local admin accounts.\nIf some accounts are authorized, they won't be listed.\nSee below some authorized accounts:\n- Administrator account\n- Azure AD role: Global administrator\n- Azure AD role: Azure AD Joined Device Local Administrator Azure AD",
+        "json": "## Devices with local admin accounts\n---\nThis report lists devices that have local admin accounts.\nIf some accounts are authorized, they won't be listed.\n\nSee below accounts that are authorized to be in the local admin group:\n- Administrator (built-in) account\n- Azure AD role: Global administrator\n- Azure AD role: Azure AD Joined Device Local Administrator Azure AD",
         "style": "info"
       },
       "name": "text - 2"
@@ -13,10 +13,11 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LocalAdminReport_CL\n| summarize LocalAdminReport_CL = count() by LocalAdminStatus_s",
-        "size": 4,
+        "query": "LocalAdmin_Resume_CL \n//| where LocalAdminCount_d > 0\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\n| where LocalAdmin_s <> \"Administrateur\"\n| summarize LocalAdminReport_CL = count() by LocalAdminStatus_s\n",
+        "size": 1,
+        "title": "Local admin status",
         "timeContext": {
-          "durationMs": 86400000
+          "durationMs": 2592000000
         },
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -36,7 +37,28 @@
           ]
         }
       },
+      "customWidth": "50",
       "name": "query - 2",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LocalAdmin_Resume_CL \r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where LocalAdminStatus_s == \"AdminFound\"\r\n| extend DeviceName = ComputerName_s\r\n| where LocalAdmin_s <> \"Administrateur\" and LocalAdmin_s !contains \"defaultuser\"\r\n| project Date=TimeGenerated,Computer=ComputerName_s,Model=Model_s,User=UserEmail_s, ['Admin count']=LocalAdminCount_d\r\n| join IntuneDevices on $left.Computer == $right.DeviceName\r\n| summarize arg_max(TimeGenerated,*) by DeviceName//, Account_s\r\n| extend DeviceInstallDate= make_datetime(CreatedDate)\r\n| extend DeviceInstallDateFormat = format_datetime(DeviceInstallDate,\"MM-dd-yyyy\")\r\n| project Date,Computer,['Admin count'],User=UserName,SerialNumber,Model,Manufacturer,['Device install date']=DeviceInstallDateFormat",
+        "size": 1,
+        "title": "Devices with local admin account(s)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 3",
       "styleSettings": {
         "showBorder": true
       }
@@ -45,18 +67,45 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LocalAdminReport_CL\r\n| summarize arg_max(TimeGenerated,*) by ComputerName_s\r\n| where LocalAdminStatus_s == \"AdminFound\"\r\n| project Computer=ComputerName_s,Model=Model_s,User=UserEmail_s, \r\n['Local admin found']=LocalAdminCount_d, ['Local admin account(s)']=LocalAdmin_s",		
-        "size": 4,
-        "title": "Devices with local admin account(s)",
+        "query": "LocalAdmin_Details_CL\r\n| where TimeGenerated > ago(7d)\r\n| where Account_s <> \"Administrateur\" and Account_s !contains \"defaultuser\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, Account_s\r\n| order by TimeGenerated\r\n| project ['Last data update']=TimeGenerated, Device=DeviceName_s, ['Admin account']=Account_s, Description=Description_s,['Added by']=AddedBy_s, ['Account creation']=CreationDate_t, ['Last password update']=PasswordLastSet_t,['Is enabled ?']=IsEnabled_b,Account_SID_s\r\n",
+        "size": 1,
+        "title": "Local admin details",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "name": "query - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LocalAdmin_Details_CL\r\n| where TimeGenerated > ago(90d)\r\n| where Account_s <> \"Administrateur\" and Account_s !contains \"defaultuser\"\r\n| where isnotempty(CreationDate_t) and isnotempty(AddedBy_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, Account_s\r\n| order by CreationDate_t\r\n| project ['Last data update']=TimeGenerated, Device=DeviceName_s, ['Admin account']=Account_s, Description=Description_s,['Added by']=AddedBy_s, ['Account creation']=CreationDate_t, ['Last password update']=PasswordLastSet_t,IsEnabled_b,UserMayChangePassword_b,Account_SID_s\r\n",
+        "size": 1,
+        "title": "Account(s) creation details",
         "timeContext": {
           "durationMs": 86400000
         },
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces"
       },
-      "name": "query - 3",
+      "name": "query - 4",
       "styleSettings": {
         "showBorder": true
       }
     }
   ],
+  "fallbackResourceIds": [
+    "/subscriptions/7f1fffa6-e07a-446b-bd04-d960d202cca2/resourceGroups/rgp-grt-dwpprd-telemetry/providers/Microsoft.OperationalInsights/workspaces/GRT-EVT"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
