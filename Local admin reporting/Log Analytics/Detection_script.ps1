@@ -1,9 +1,11 @@
 #**************************** Part to fill ************************************
 # Log analytics part
+$ResourceGroup = "" # Workgroup associated to Log Analytics Workspace
+$WorkspaceName = "" # Log Analytics Workspace name
 $CustomerId = "" # Log Analytics Workspace ID
 $SharedKey = '' # Log Analytics Workspace Primary Key
-$LogType = "LocalAdminReport" # Custom log to create in lo Analytics
 $TimeStampField = "" # let to blank
+$SubscriptionID = ""
 #*******************************************************************************
 
 # Log analytics functions
@@ -62,17 +64,23 @@ $Manufacturer = $WMI_computersystem.manufacturer
 If($Manufacturer -eq "lenovo")
 	{
 		$Get_Current_Model = $WMI_computersystem.SystemFamily.split(" ")[1]			
-	}
-Else
-	{
+	}Else{
 		$Get_Current_Model = $WMI_computersystem.Model		
 	}
 
-# Getting local admin accounts
+
+$Current_date = get-date -Format "dddd MM/dd/yyyy HH:mm K"
+
+$Authorized_Accounts = @()
+$Local_Admin_LA = @()
+$LocalAdmin_Details = @()
+
+$Local_admin_found = 0
+
 $Get_Local_AdminGroup = Gwmi win32_group -Filter "Domain='$env:computername' and SID='S-1-5-32-544'"
 $Get_Local_AdminGroup_Name = $Get_Local_AdminGroup.Name
-$Get_Administrator_Name = $Get_Local_AdminGroup_Name -replace ".$"	
-$Authorized_Accounts += $Get_Administrator_Name
+$Get_Administrator_Name = $Get_Local_AdminGroup_Name -replace ".$"	# Built-in admin user account: Administrateur or Administrator
+$Get_Administrator_Status = (Get-LocalUser $Get_Administrator_Name).Enabled
 
 #*************************************************************************************************
 # In this part we will add authorized accounts meaning accounts that may be in the local admin group
@@ -82,57 +90,127 @@ $Authorized_Accounts += $Get_Administrator_Name
 # Get the ID and convert ID to SID, as below:
 # - Use this website: https://erikengberg.com/azure-ad-object-id-to-sid/
 # - Use this script: https://oliverkieselbach.com/2020/05/13/powershell-helpers-to-convert-azure-ad-object-ids-and-sids/
+
 $Authorized_Accounts = @(
-$Get_Administrator_Name; # Built-in admin user account: Administrateur or Administrator... depending of the OS language
 )
 #*************************************************************************************************
 
-$Local_Admin_Group_Infos = ([ADSI]"WinNT://$env:COMPUTERNAME").psbase.children.find("$Get_Local_AdminGroup_Name")
-$Get_Local_AdminGroup_Members = $Local_Admin_Group_Infos.psbase.invoke("Members")
+If($Get_Administrator_Status -eq $False)
+	{
+		$Authorized_Accounts += $Get_Administrator_Name	
+	}
 
-$Local_admin_found = 0
+$Get_Local_AdminGroup_Members = ([ADSI]"WinNT://./Administrateurs").psbase.Invoke('Members') | % {
+ ([ADSI]$_).InvokeGet('AdsPath')
+}
+$Get_Local_AdminGroup_Members = $Get_Local_AdminGroup_Members -replace "WinNT://",""
+
 foreach($Member in $Get_Local_AdminGroup_Members) 
 {
-	$Get_AdminAccount_ADS_Path = $Member.GetType().InvokeMember('Adspath','GetProperty',$null,$Member,$null) 
-	$Account_Infos = $Get_AdminAccount_ADS_Path.split('/',[StringSplitOptions]::RemoveEmptyEntries)
-	$Other_Local_Admin = $Account_Infos[-1] | Where {($Authorized_Accounts -notcontains $_)}			
+	$Account_Infos = $Member.split("/")
+	$Account_Name = $Account_Infos[-1]
+	$Other_Local_Admin = $Account_Name | Where {($Authorized_Accounts -notcontains $_)}
 	If($Other_Local_Admin -ne $null)
 		{
-			$Convert_User_to_SID = (New-Object System.Security.Principal.NTAccount("$Other_Local_Admin")).Translate([System.Security.Principal.SecurityIdentifier]).value			
+			$Account_Info = Get-LocalUser $Account_Name -ea silentlycontinue
+			If($Account_Info -ne $null)
+				{
+					$Member_Description = $Account_Info.Description
+					$PasswordLastSet = $Account_Info.PasswordLastSet		
+					$IsEnabled = $Account_Info.Enabled		
+					$UserMayChangePassword = $Account_Info.UserMayChangePassword		
+					$PasswordRequired = $Account_Info.PasswordRequired		
+					$Account_SID = $Account_Info.SID.value		
 
-			$Local_admin_found++
+					If($Member_Description -eq $null)
+						{
+							$Member_Description = "No description"
+						}
+
+					If($IsEnabled -eq $null)
+						{
+							$IsEnabled = "Null"
+						}
+
+					If($PasswordLastSet -eq $null)
+						{
+							$PasswordLastSet = "Null"
+						}
+						
+					If($UserMayChangePassword -eq $null)
+						{
+							$UserMayChangePassword = "Null"
+						}
+
+					If($PasswordRequired -eq $null)
+						{
+							$PasswordRequired = "Null"
+						}
+
+					If($Account_SID -eq $null)
+						{
+							$Account_SID = "Null"
+						}						
+				}
+			Else
+				{
+					$Member_Description = "Cloud account"
+					$PasswordLastSet = "Can not get info"	
+					$IsEnabled = "Can not get info"			
+					$UserMayChangePassword = "Can not get info"			
+					$PasswordRequired = "Can not get info"		
+					$Account_SID = "Can not get info"						
+				}
+			
+			$Obj = New-Object PSObject
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CurrentDate" -Value $Current_date
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "DeviceName" -Value $env:computername
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "Account" -Value $Account_Name
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "Description" -Value $Member_Description
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "PasswordLastSet" -Value $PasswordLastSet
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "IsEnabled" -Value $IsEnabled
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "UserMayChangePassword" -Value $UserMayChangePassword
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "IsPasswordRequired" -Value $PasswordRequired
+			Add-Member -InputObject $Obj -MemberType NoteProperty -Name "Account_SID" -Value $Account_SID
+
+			$Convert_User_to_SID = (New-Object System.Security.Principal.NTAccount("$Other_Local_Admin")).Translate([System.Security.Principal.SecurityIdentifier]).value
+
+			$Local_admin_found++ 
 			$Get_LocalAdmin_Event = Get-EventLog Security -InstanceId 4732 -ea silentlycontinue | Where-Object {(($_.Message -like "*$Get_Local_AdminGroup_Name*") -and ($_.Message -like "*$Convert_User_to_SID*"))}
 			If($Get_LocalAdmin_Event -ne $null)
 				{
 					$Get_LocalAdmin_Event_Date = $Get_LocalAdmin_Event.TimeGenerated
 					$Get_LocalAdmin_Event_message = $Get_LocalAdmin_Event.message
 
-					$Event_Message = ((($Get_LocalAdmin_Event_message -split "`n").trim() | select-string -pattern "account")[0])
+					$Event_Message = ((($Get_LocalAdmin_Event_message -split "`n").trim() | select-string -pattern "nom")[0])
 					$Event_Message = $Event_Message.ToString()
 					$Added_by = $Event_Message.split(":")[1].Trim()
 
-					$Account_Info = "Added by $Added_by on $Get_LocalAdmin_Event_Date"		
-					$Local_Admin_LA += "$Other_Local_Admin ($Account_Info)`n"							
+					$Account_Info = "$Added_by;$Get_LocalAdmin_Event_Date"
+					$Local_Admin_LA += "$Other_Local_Admin ($Account_Info)`n"
+					Add-Member -InputObject $Obj -MemberType NoteProperty -Name "AddedBy" -Value $Added_by
+					Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CreationDate" -Value $Get_LocalAdmin_Event_Date
 				}
 			Else
 				{
-					$Local_Admin_LA += "$Other_Local_Admin`n"
-				}				
-		}				
-}	
+					$Local_Admin_LA += "$Other_Local_Admin"
+					Add-Member -InputObject $Obj -MemberType NoteProperty -Name "AddedBy" -Value "Can not get info"
+					Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CreationDate" -Value "Can not get info"
+				}
+		}
+	$LocalAdmin_Details += $Obj
+}
 
 If($Local_Admin_LA -ne $null)
 	{
 		$Local_Admin_LA = $Local_Admin_LA.TrimEnd()		
-		write-output $Local_Admin_LA
-		$Admin_Status = "AdminFound"		
+		$Admin_Status = "AdminFound"				
+		write-output "$Get_Current_Model;$Admin_Status;$Local_admin_found;$Local_Admin_List"
 		$Exit_Status = 1
-	}
-Else
-	{
-		write-output "NoAdmin"
+	}Else{
 		$Admin_Status = "NoAdmin"
-		$Exit_Status = 0		
+		write-output "NoAdmin"
+		$Exit_Status = 0
 	}
 
 # Creating the object to send to Log Analytics custom logs
@@ -151,10 +229,22 @@ $params = @{
     CustomerId = $customerId
     SharedKey  = $sharedKey
     Body       = ([System.Text.Encoding]::UTF8.GetBytes($LocalAdminResultJson))
-    LogType    = $LogType 
+    LogType    = "LocalAdmin_Resume" 
 }
 $LogResponse = Post-LogAnalyticsData @params
-	
+
+If($Local_admin_found -gt 0)
+	{
+		$LocalAdmin_Details_ResultJson = $LocalAdmin_Details | ConvertTo-Json
+		$params = @{
+			CustomerId = $customerId
+			SharedKey  = $sharedKey
+			Body       = ([System.Text.Encoding]::UTF8.GetBytes($LocalAdmin_Details_ResultJson))
+			LogType    = "LocalAdmin_Details" 
+		}
+		$LogResponse = Post-LogAnalyticsData @params		
+	}
+		
 If($Exit_Status -eq 1)
 	{
 		EXIT 1
