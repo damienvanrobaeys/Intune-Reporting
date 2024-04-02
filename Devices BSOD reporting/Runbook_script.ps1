@@ -23,8 +23,8 @@ $Use_SharePoint_Logs = $True # $True or $False
 # If $True, configure SharePoint app info
 $ClientID = ""
 $Secret = ''            
-$Site_URL = ""
-$Folder_Location = ""
+$Site_URL = "" # SharePoint Basepath + Site e.g. https://<yourtenant>.sharepoint.com/sites/<yoursite>
+$Folder_Location = "" #Complete path after your SharePoint basepath e.g. "/sites/<yoursite>/Shared-Documents/BSOD-Logs"
 $Log_File_Path = "" 
 
 # Info to fill
@@ -511,7 +511,7 @@ ForEach($BSOD in $Get_All_BSOD)
         If($Use_SharePoint_Logs -eq $True)
             {
                 $BSOD_File_Name = "BSOD_$Device_Name.zip"
-                $BSOD_Log_File = "/sites/DWP-Support/Documents partages/Windows/BSOD/$BSOD_File_Name"
+                $BSOD_Log_File = "$Folder_Location/$BSOD_File_Name"
                 $Get_Log_File = Get-PnPFile -Url $BSOD_Log_File -ea SilentlyContinue
                 If($Get_Log_File -ne $null)
                     {
