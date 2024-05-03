@@ -1,6 +1,6 @@
 $DcrImmutableId = "" # id available in DCR > JSON view > immutableId
 $DceURI = "" # available in DCE > Logs Ingestion value
-$Table = "DriversInventory_CL" # custom log to create
+$Table = "YourTableName_CL" # custom log to create
 
 $tenantId = "" #the tenant ID in which the Data Collection Endpoint resides
 $appId = "" #the app ID created and granted permissions
@@ -38,6 +38,7 @@ $uri = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
 $bearerToken = (Invoke-RestMethod -Uri $uri -Method "Post" -Body $body -Headers $headers).access_token
 
 $body = $PNPSigned_Drivers | ConvertTo-Json #-AsArray;
+# $body = $PNPSigned_Drivers | ConvertTo-Json -AsArray; # for windows 11
 $headers = @{"Authorization" = "Bearer $bearerToken"; "Content-Type" = "application/json" };
 $uri = "$DceURI/dataCollectionRules/$DcrImmutableId/streams/Custom-$Table"+"?api-version=2023-01-01";
 $uploadResponse = Invoke-RestMethod -Uri $uri -Method "Post" -Body $body -Headers $headers;
