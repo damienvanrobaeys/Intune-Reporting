@@ -1,0 +1,18 @@
+  {
+    "TimeGenerated": "2024-04-28T19:36:18.8503557Z",
+    "Device": "DESKTOP-00N66SV",
+    "ModelMTM": "20WN",
+    "ModelFamilyname": "ThinkPad T14s Gen 2",
+    "SN": "PC2JLMKY",
+    "User": "damien.vanrobaeys",
+    "CurrentBIOSVersion": "1.51",
+    "CurrentBIOSDate": "2023/02/27",
+    "CurrentBIOSDateFormat": "2023-02-27T00:00:00",
+    "CurrentBIOSDaysOld": 426,
+    "LastBIOSVersion": "1.57",
+    "LastBIOSDate": "2024-03-25",
+    "LastBIOSDateFormat": "2024-03-25T00:00:00",
+    "IsUptoDate": "No",
+    "NewBIOSDaysOld": 34,
+    "CurrentBIOSDaysOldRange": "365_730"
+  }
