@@ -1,7 +1,8 @@
 # Info about DCE, DCR, Table
 $DcrImmutableId = "dcr-" # id available in DCR > JSON view > immutableId
 $DceURI = "" # available in DCE > Logs Ingestion value
-$Table = "_CL" # custom log to create
+$Table = "LenovoBIOS_CL" # custom log to create
+
 
 # Getting a token and authenticating to your tenant using the managed identity
 $url = $env:IDENTITY_ENDPOINT  
@@ -45,6 +46,7 @@ $url = "https://download.lenovo.com/cdrt/td/catalogv2.xml"
 $Get_Current_Date = get-date
 
 $Lenovo_Devices = $Get_All_Devices | where {(($_.operatingSystem -eq "windows") -and ($_.manufacturer -eq "lenovo"))}
+
 ForEach($Device in $Lenovo_Devices)
     {
         $Device_ID = $Device.id
@@ -138,7 +140,6 @@ ForEach($Device in $Lenovo_Devices)
 
         $WindowsVersion2 = "win10"       
         $CatalogUrl = "https://download.lenovo.com/catalog/$Get_MTM`_$WindowsVersion2.xml"
-        [System.Xml.XmlDocument]$CatalogXml = (New-Object -TypeName System.Net.WebClient).DownloadString($CatalogUrl)
         try
             {
                 [System.Xml.XmlDocument]$CatalogXml = (New-Object -TypeName System.Net.WebClient).DownloadString($CatalogUrl)
@@ -211,6 +212,22 @@ ForEach($Device in $Lenovo_Devices)
             {
                 $Get_Current_Date = get-date
                 $Last_BIOS_Date = $PackageXml.Package.ReleaseDate 
+				$Last_BIOS_Severity = $PackageXml.Package.severity.type
+				#f($Last_BIOS_Severity -ne $null)
+				#	{
+						If($Last_BIOS_Severity -eq "1")
+							{
+								$Last_BIOS_Severity_Label = "Critical"
+							}
+						ElseIf($Last_BIOS_Severity -eq "2")
+							{
+								$Last_BIOS_Severity_Label = "Recommended"
+							}
+						Else
+							{
+								$Last_BIOS_Severity_Label = "Unknown"
+							}							
+				#	}                
                 If($Last_BIOS_Date -ne $null)
                     {
                         Try{
@@ -264,7 +281,9 @@ ForEach($Device in $Lenovo_Devices)
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSDateFormat" -Value $Get_Converted_BIOS_Date	
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "IsUptoDate" -Value $BIOS_Status
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "NewBIOSDaysOld" -Value $Diff_in_days	 
-        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CurrentBIOSDaysOldRange" -Value $Current_BIOS_Days_Old_Range	 
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CurrentBIOSDaysOldRange" -Value $Current_BIOS_Days_Old_Range
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSSeverity" -Value $Last_BIOS_Severity	
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSSeverityLabel" -Value $Last_BIOS_Severity_Label	        	 
         $Devices_Array += $Obj
     }
 
@@ -272,6 +291,7 @@ $BIOS_Update_Status = $Devices_Array | where {($_.IsUptoDate -ne "Can not get in
 ForEach($Device in $BIOS_Update_Status)
     {
         $body = $Device | ConvertTo-Json -AsArray;
+        $body
         # Sending data to Log Analytics Custom Log
         $headers = @{"Authorization" = "Bearer $bearerToken"; "Content-Type" = "application/json" };
         $uri = "$DceURI/dataCollectionRules/$DcrImmutableId/streams/Custom-$Table"+"?api-version=2023-01-01";
