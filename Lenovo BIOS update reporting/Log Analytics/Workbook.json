@@ -285,6 +285,29 @@
             ]
           },
           {
+            "id": "5b8b7a2f-4004-410b-91f6-a32b09481733",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerMTM",
+            "label": "Filter on MTM",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "LenovoBIOS_CL\r\n| where isnotempty(ModelMTM)\r\n| distinct ModelMTM",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
             "id": "2ddd8ba4-0deb-4a65-af34-86013eee4377",
             "version": "KqlParameterItem/1.0",
             "name": "ComputerName",
@@ -574,8 +597,8 @@
                   {
                     "operator": "Default",
                     "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
+                    "representation": "Sev4",
+                    "text": "{0}{1} Unknown"
                   }
                 ]
               }
@@ -599,7 +622,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['BIOS state ?']=IsUptoDate, Device, User, MTM=ModelMTM, Model=ModelFamilyname,['Current BIOS']=CurrentBIOSVersion,['New BIOS']=LastBIOSVersion\r\n\r\n\r\n\r\n",
+        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where ModelMTM has_any ({ComputerMTM})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['BIOS state ?']=IsUptoDate, Device, User, MTM=ModelMTM, Model=ModelFamilyname,['Current BIOS']=CurrentBIOSVersion,['New BIOS']=LastBIOSVersion\r\n\r\n\r\n\r\n",
         "size": 1,
         "title": "BIOS update details (uptodate and not uptodate)",
         "timeContext": {
@@ -656,7 +679,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| extend CurrentBIOSDateFormated = format_datetime(CurrentBIOSDate, 'yyyy-M-dd')\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device, User, ['Model MTM']=ModelMTM, Model=ModelFamilyname,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['CurrentBIOS date']=CurrentBIOSDateFormated,['Last BIOS date']=LastBIOSDateFormated\r\n",
+        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where ModelMTM has_any ({ComputerMTM})\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| extend CurrentBIOSDateFormated = format_datetime(CurrentBIOSDate, 'yyyy-M-dd')\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device, User, ['Model MTM']=ModelMTM, Model=ModelFamilyname,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['CurrentBIOS date']=CurrentBIOSDateFormated,['Last BIOS date']=LastBIOSDateFormated\r\n",
         "size": 1,
         "title": "Devices with BIOS not uptodate",
         "timeContext": {
@@ -683,7 +706,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOld < 365\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| order by CurrentBIOSDaysOld desc\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device,User,Model=ModelFamilyname,['Not updated since (in days']=CurrentBIOSDaysOld,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['BIOS severity']=LastBIOSSeverityLabel",
+        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOld < 365\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| order by CurrentBIOSDaysOld desc\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where ModelMTM has_any ({ComputerMTM})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device,User,Model=ModelFamilyname,['Not updated since (in days']=CurrentBIOSDaysOld,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['BIOS severity']=LastBIOSSeverityLabel",
         "size": 0,
         "title": "Devices with BIOS < 1 year",
         "timeContext": {
@@ -715,8 +738,8 @@
                   {
                     "operator": "Default",
                     "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
+                    "representation": "Sev4",
+                    "text": "{0}{1} Unknown"
                   }
                 ]
               }
@@ -739,7 +762,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOld > 730\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device,User,Model=ModelFamilyname,['Not updated since (in days']=CurrentBIOSDaysOld,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['BIOS severity']=LastBIOSSeverityLabel",
+        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOld > 730\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n| where LastBIOSSeverityLabel has_any ({BIOSSeverity})\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where ModelMTM has_any ({ComputerMTM})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device,User,Model=ModelFamilyname,['Not updated since (in days']=CurrentBIOSDaysOld,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['BIOS severity']=LastBIOSSeverityLabel",
         "size": 0,
         "title": "Devices with BIOS > 2 years",
         "timeContext": {
@@ -770,8 +793,8 @@
                   {
                     "operator": "Default",
                     "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
+                    "representation": "Sev4",
+                    "text": "{0}{1} Unknown"
                   }
                 ]
               }
