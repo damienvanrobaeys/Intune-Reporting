@@ -466,6 +466,7 @@
         "timeContext": {
           "durationMs": 2592000000
         },
+        "showRefreshButton": true,
         "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -533,6 +534,7 @@
         "timeContext": {
           "durationMs": 2592000000
         },
+        "showRefreshButton": true,
         "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -571,6 +573,7 @@
         "timeContext": {
           "durationMs": 2592000000
         },
+        "showRefreshButton": true,
         "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -628,6 +631,8 @@
         "timeContext": {
           "durationMs": 2592000000
         },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "gridSettings": {
@@ -685,6 +690,8 @@
         "timeContext": {
           "durationMs": 86400000
         },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "gridSettings": {
@@ -712,6 +719,7 @@
         "timeContext": {
           "durationMs": 86400000
         },
+        "showRefreshButton": true,
         "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -768,6 +776,8 @@
         "timeContext": {
           "durationMs": 2592000000
         },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "gridSettings": {
