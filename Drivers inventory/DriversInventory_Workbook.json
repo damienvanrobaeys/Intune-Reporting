@@ -68,7 +68,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_DriversInventory_CL\r\n| where isnotempty(ModelFriendlyName_s)\r\n| distinct ModelFriendlyName_s\r\n",
+            "query": "DriversInventory_CL\r\n| where isnotempty(ModelFriendlyName_s)\r\n| distinct ModelFriendlyName_s\r\n",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -94,7 +94,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_DriversInventory_CL\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n//| summarize GRT_DriversInventory_CL = count() by manufacturer_s\r\n| distinct DeviceManufacturer_s",
+            "query": "DriversInventory_CL\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n//| summarize DriversInventory_CL = count() by manufacturer_s\r\n| distinct DeviceManufacturer_s",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -117,7 +117,7 @@
             "multiSelect": true,
             "quote": "'",
             "delimiter": ",",
-            "query": "GRT_DriversInventory_CL\r\n| where isnotempty(DeviceClass_s)\r\n| distinct DeviceClass_s\r\n",
+            "query": "DriversInventory_CL\r\n| where isnotempty(DeviceClass_s)\r\n| distinct DeviceClass_s\r\n",
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -148,7 +148,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL \r\n| where isnotempty(DeviceName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| count\r\n",
+        "query": "DriversInventory_CL \r\n| where isnotempty(DeviceName_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| count\r\n",
         "size": 4,
         "timeContext": {
           "durationMs": 86400000
@@ -215,7 +215,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL \r\n| where isnotempty(ModelFriendlyName_s)\r\n| summarize arg_max(TimeGenerated,*) by ModelFriendlyName_s\r\n| project ModelFriendlyName_s\r\n| count\r\n",
+        "query": "DriversInventory_CL \r\n| where isnotempty(ModelFriendlyName_s)\r\n| summarize arg_max(TimeGenerated,*) by ModelFriendlyName_s\r\n| project ModelFriendlyName_s\r\n| count\r\n",
         "size": 4,
         "timeContext": {
           "durationMs": 86400000
@@ -265,7 +265,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL \r\n| where isnotempty(DeviceManufacturer_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceManufacturer_s\r\n| project DeviceManufacturer_s\r\n| count",
+        "query": "DriversInventory_CL \r\n| where isnotempty(DeviceManufacturer_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceManufacturer_s\r\n| project DeviceManufacturer_s\r\n| count",
         "size": 4,
         "timeContext": {
           "durationMs": 86400000
@@ -314,7 +314,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| summarize GRT_DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by GRT_DriversInventory_CL",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| summarize DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by DriversInventory_CL",
         "size": 1,
         "title": "Devices count per models",
         "timeContext": {
@@ -330,7 +330,7 @@
             "formatter": 1
           },
           "leftContent": {
-            "columnMatch": "GRT_DriversInventory_CL",
+            "columnMatch": "DriversInventory_CL",
             "formatter": 12,
             "formatOptions": {
               "palette": "auto"
@@ -359,7 +359,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| summarize GRT_DriversInventory_CL = count() by DriverName_s, DriverVersion_s\r\n| order by GRT_DriversInventory_CL\r\n| project ['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Devices count']=GRT_DriversInventory_CL\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| summarize DriversInventory_CL = count() by DriverName_s, DriverVersion_s\r\n| order by DriversInventory_CL\r\n| project ['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Devices count']=DriversInventory_CL\r\n",
         "size": 1,
         "title": "Devices count per drivers version",
         "timeContext": {
@@ -379,7 +379,7 @@
             "formatter": 1
           },
           "leftContent": {
-            "columnMatch": "GRT_DriversInventory_CL",
+            "columnMatch": "DriversInventory_CL",
             "formatter": 12,
             "formatOptions": {
               "palette": "auto"
@@ -408,7 +408,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated, Device=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s,DeviceID=DeviceID_s,Constructeur=manufacturer_s\r\n| limit 1000 ",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated, Device=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s,DeviceID=DeviceID_s,Constructeur=manufacturer_s\r\n| limit 1000 ",
         "size": 0,
         "title": "Full details (filter on device name for better result)",
         "timeContext": {
@@ -447,7 +447,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n| limit 5000\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n| limit 5000\r\n",
         "size": 1,
         "title": "Drivers installed per models",
         "timeContext": {
@@ -474,7 +474,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t > ago(60d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t > ago(60d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
         "size": 1,
         "title": "Last drivers installed for a device (last 2 months)",
         "timeContext": {
@@ -503,7 +503,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,Model=ModelFriendlyName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
         "size": 0,
         "title": "Drivers > 2 years (filter by device name)",
         "timeContext": {
@@ -524,7 +524,7 @@
             "formatter": 1
           },
           "leftContent": {
-            "columnMatch": "GRT_DriversInventory_CL",
+            "columnMatch": "DriversInventory_CL",
             "formatter": 12,
             "formatOptions": {
               "palette": "auto"
@@ -559,7 +559,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize GRT_DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by GRT_DriversInventory_CL",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s//, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize DriversInventory_CL = count() by ModelFriendlyName_s\r\n| order by DriversInventory_CL",
         "size": 1,
         "title": "Devices with drivers > 2 years",
         "timeContext": {
@@ -575,7 +575,7 @@
             "formatter": 1
           },
           "leftContent": {
-            "columnMatch": "GRT_DriversInventory_CL",
+            "columnMatch": "DriversInventory_CL",
             "formatter": 12,
             "formatOptions": {
               "palette": "auto"
@@ -604,7 +604,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DeviceClass_s has_any ({Class})\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize GRT_DriversInventory_CL = count() by  DriverName_s\r\n| order by GRT_DriversInventory_CL\r\n| project Driver=DriverName_s",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where DeviceClass_s has_any ({Class})\r\n| where DriverDate_value_t < ago(730d)\r\n| where DriverName_s !contains \"Cisco AnyConnect\"\r\n| summarize DriversInventory_CL = count() by  DriverName_s\r\n| order by DriversInventory_CL\r\n| project Driver=DriverName_s",
         "size": 0,
         "title": "Older drivers (> 2 years)",
         "timeContext": {
@@ -627,7 +627,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"DISPLAY\"// or DeviceClass_s contains \"MONITOR\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"DISPLAY\"// or DeviceClass_s contains \"MONITOR\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s\r\n",
         "size": 1,
         "title": "List of graphics drivers per models",
         "timeContext": {
@@ -654,7 +654,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "GRT_DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"NET\" or DeviceClass_s contains \"NetClient\" or DeviceClass_s contains \"NetService\" or DeviceClass_s contains \"Infrared\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s, Class=DeviceClass_s\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceClass_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DeviceClass_s contains \"NET\" or DeviceClass_s contains \"NetClient\" or DeviceClass_s contains \"NetService\" or DeviceClass_s contains \"Infrared\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| order by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t,Device=DeviceName_s, Class=DeviceClass_s\r\n",
         "size": 0,
         "title": "List of network drivers per models",
         "timeContext": {
@@ -781,7 +781,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let Device1 = GRT_DriversInventory_CL\r\n//| where DeviceName_s contains \"{Device1:escape}\"\r\n| where DeviceName_s contains_cs \"LAPTOP-0SCJHEDR\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = GRT_DriversInventory_CL\r\n| where DeviceName_s contains_cs \"LAPTOP-Q3CT1MAO\"\r\n//| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| summarize SameDrivers=countif(DriverVersion_s == DriverVersion_s1), DiffVersions=countif(DriverVersion_s <> DriverVersion_s1) \r\n| project ['Same drivers & same versions']=SameDrivers, ['Same drivers but different versions']=DiffVersions",
+        "query": "let Device1 = DriversInventory_CL\r\n//| where DeviceName_s contains \"{Device1:escape}\"\r\n| where DeviceName_s contains_cs \"LAPTOP-0SCJHEDR\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = DriversInventory_CL\r\n| where DeviceName_s contains_cs \"LAPTOP-Q3CT1MAO\"\r\n//| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| summarize SameDrivers=countif(DriverVersion_s == DriverVersion_s1), DiffVersions=countif(DriverVersion_s <> DriverVersion_s1) \r\n| project ['Same drivers & same versions']=SameDrivers, ['Same drivers but different versions']=DiffVersions",
         "size": 4,
         "timeContext": {
           "durationMs": 2592000000
@@ -849,7 +849,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let Device1 = GRT_DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = GRT_DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| where DriverVersion_s <> DriverVersion_s1\r\n| extend DriverDate1=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| extend DriverDate2=format_datetime(DriverDate_value_t1, \"dd/MM/yyyy\")\r\n| project Driver=DriverName_s,['Driver version device 1']=DriverVersion_s,['Driver version device 2']=DriverVersion_s1,['Driver date device 1']=DriverDate1,['Driver date device 2']=DriverDate2,Class=DeviceClass_s,DeviceID=DeviceID_s",
+        "query": "let Device1 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| where DriverVersion_s <> DriverVersion_s1\r\n| extend DriverDate1=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| extend DriverDate2=format_datetime(DriverDate_value_t1, \"dd/MM/yyyy\")\r\n| project Driver=DriverName_s,['Driver version device 1']=DriverVersion_s,['Driver version device 2']=DriverVersion_s1,['Driver date device 1']=DriverDate1,['Driver date device 2']=DriverDate2,Class=DeviceClass_s,DeviceID=DeviceID_s",
         "size": 0,
         "title": "Same drivers but different versions",
         "timeContext": {
@@ -884,7 +884,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let Device1 = GRT_DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = GRT_DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| where DriverVersion_s == DriverVersion_s1\r\n| extend DriverDate1=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| extend DriverDate2=format_datetime(DriverDate_value_t1, \"dd/MM/yyyy\")\r\n| project Driver=DriverName_s,['Driver version device 1']=DriverVersion_s,['Driver version device 2']=DriverVersion_s1,['Driver date device 1']=DriverDate1,['Driver date device 2']=DriverDate2,Class=DeviceClass_s,DeviceID=DeviceID_s",
+        "query": "let Device1 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join Device1 on $left.DriverName_s == $right.DriverName_s\r\n| where DriverName_s == DriverName_s1\r\n| where DriverVersion_s == DriverVersion_s1\r\n| extend DriverDate1=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| extend DriverDate2=format_datetime(DriverDate_value_t1, \"dd/MM/yyyy\")\r\n| project Driver=DriverName_s,['Driver version device 1']=DriverVersion_s,['Driver version device 2']=DriverVersion_s1,['Driver date device 1']=DriverDate1,['Driver date device 2']=DriverDate2,Class=DeviceClass_s,DeviceID=DeviceID_s",
         "size": 0,
         "title": "Same drivers and same versions",
         "timeContext": {
@@ -910,6 +910,64 @@
         }
       ],
       "name": "query - 18",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let Device1 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join kind=rightanti Device1 on $left.DriverName_s == $right.DriverName_s\r\n| extend DriverDate=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| project Device=DeviceName_s,Driver=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=DriverDate,Class=DeviceClass_s,DeviceID=DeviceID_s",
+        "size": 1,
+        "title": "Drivers in Device 1 but not in Device 2",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Comparison"
+        },
+        {
+          "parameterName": "Device1",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "Device2",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 22",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let Device1 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device1:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nlet Device2 = DriversInventory_CL\r\n| where DeviceName_s contains \"{Device2:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s);\r\nDevice2 | join kind=leftanti Device1 on $left.DriverName_s == $right.DriverName_s\r\n| extend DriverDate=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\")\r\n| project Device=DeviceName_s,Driver=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=DriverDate,Class=DeviceClass_s,DeviceID=DeviceID_s",
+        "size": 1,
+        "title": "Drivers in Device 2 but not in Device 1",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Comparison"
+      },
+      "name": "query - 23",
       "styleSettings": {
         "showBorder": true
       }
