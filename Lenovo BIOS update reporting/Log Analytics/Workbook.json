@@ -111,10 +111,10 @@
         "comparison": "isEqualTo",
         "value": "Resume"
       },
-      "customWidth": "30",
+      "customWidth": "35",
       "name": "query - 2",
       "styleSettings": {
-        "maxWidth": "30",
+        "maxWidth": "40",
         "showBorder": true
       }
     },
@@ -205,6 +205,148 @@
       "name": "query - 15",
       "styleSettings": {
         "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where isnotempty(LastBIOSSeverity)\r\n| where IsUptoDate == \"No\"\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize LenovoBIOS_CL = count() by LastBIOSSeverityLabel//,ModelFamilyname\r\n\r\n\r\n\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not uptodate by severity",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Critical",
+              "color": "redBright"
+            },
+            {
+              "seriesName": "Recommended",
+              "color": "orange"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "35",
+      "name": "query - 16",
+      "styleSettings": {
+        "margin": "20",
+        "padding": "40",
+        "maxWidth": "40",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOldRange <> \"\"\r\n| where CurrentBIOSDaysOldRange <> \"730\"\r\n| where CurrentBIOSDaysOldRange <> \"1_365\"\r\n//| where ModelFamilyname has_any ({ComputerModel})\r\n| summarize LenovoBIOS_CL = count() by CurrentBIOSDaysOldRange\r\n",
+        "size": 4,
+        "title": "Devices with BIOS not uptodate since",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "CurrentBIOSDaysOldRange",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "LenovoBIOS_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "graphSettings": {
+          "type": 0,
+          "topContent": {
+            "columnMatch": "CurrentBIOSDaysOldRange",
+            "formatter": 1
+          },
+          "centerContent": {
+            "columnMatch": "LenovoBIOS_CL",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "730_More",
+              "label": "> 2 years",
+              "color": "redBright"
+            },
+            {
+              "seriesName": "365_730",
+              "label": "Between 1 and 2 years",
+              "color": "orange"
+            },
+            {
+              "seriesName": "180_365",
+              "label": "< 1 year",
+              "color": "blueDark"
+            },
+            {
+              "seriesName": "1_180",
+              "label": "< 180 days",
+              "color": "blue"
+            }
+          ]
+        },
+        "mapSettings": {
+          "locInfo": "LatLong",
+          "sizeSettings": "LenovoBIOS_CL",
+          "sizeAggregation": "Sum",
+          "legendMetric": "LenovoBIOS_CL",
+          "legendAggregation": "Sum",
+          "itemColorSettings": {
+            "type": "heatmap",
+            "colorAggregation": "Sum",
+            "nodeColorField": "LenovoBIOS_CL",
+            "heatmapPalette": "greenRed"
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "50",
+      "name": "query - 13",
+      "styleSettings": {
+        "maxWidth": "60",
         "showBorder": true
       }
     },
@@ -355,106 +497,6 @@
         "value": "Details"
       },
       "name": "parameters - 11"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where IsUptoDate == \"No\"\r\n| where CurrentBIOSDaysOldRange <> \"\"\r\n| where CurrentBIOSDaysOldRange <> \"730\"\r\n| where CurrentBIOSDaysOldRange <> \"1_365\"\r\n//| where ModelFamilyname has_any ({ComputerModel})\r\n| summarize LenovoBIOS_CL = count() by CurrentBIOSDaysOldRange\r\n",
-        "size": 4,
-        "title": "Devices with BIOS not updated since",
-        "timeContext": {
-          "durationMs": 2592000000
-        },
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "visualization": "piechart",
-        "tileSettings": {
-          "showBorder": false,
-          "titleContent": {
-            "columnMatch": "CurrentBIOSDaysOldRange",
-            "formatter": 1
-          },
-          "leftContent": {
-            "columnMatch": "LenovoBIOS_CL",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "auto"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        },
-        "graphSettings": {
-          "type": 0,
-          "topContent": {
-            "columnMatch": "CurrentBIOSDaysOldRange",
-            "formatter": 1
-          },
-          "centerContent": {
-            "columnMatch": "LenovoBIOS_CL",
-            "formatter": 1,
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        },
-        "chartSettings": {
-          "seriesLabelSettings": [
-            {
-              "seriesName": "730_More",
-              "label": "> 2 years",
-              "color": "redBright"
-            },
-            {
-              "seriesName": "365_730",
-              "label": "Between 1 and 2 years",
-              "color": "orange"
-            },
-            {
-              "seriesName": "180_365",
-              "label": "< 1 year",
-              "color": "blueDark"
-            },
-            {
-              "seriesName": "1_180",
-              "label": "< 180 days",
-              "color": "blue"
-            }
-          ]
-        },
-        "mapSettings": {
-          "locInfo": "LatLong",
-          "sizeSettings": "LenovoBIOS_CL",
-          "sizeAggregation": "Sum",
-          "legendMetric": "LenovoBIOS_CL",
-          "legendAggregation": "Sum",
-          "itemColorSettings": {
-            "type": "heatmap",
-            "colorAggregation": "Sum",
-            "nodeColorField": "LenovoBIOS_CL",
-            "heatmapPalette": "greenRed"
-          }
-        }
-      },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "Resume"
-      },
-      "name": "query - 13",
-      "styleSettings": {
-        "showBorder": true
-      }
     },
     {
       "type": 3,
