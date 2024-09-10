@@ -1,0 +1,412 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Warranty report status (for Lenovo devices)\n---\nThis workbook allows you to know:\n- Warranty status\n- Remaining days before end of warranty\n- Devices with expired warranty by models\n- Devices with expired warranty by models details",
+        "style": "info"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "8d30691f-bf50-4ccd-90f8-9e1676cde000",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Warranty resume",
+            "subTarget": "Resume",
+            "preText": "Warranty resume",
+            "style": "link"
+          },
+          {
+            "id": "1fb91e8e-1269-4802-ac8f-68f02990a669",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Warranty details",
+            "subTarget": "Details",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| where isnotempty(Status)\r\n| summarize LenovoWarranty_CL = count() by Status,ModelFamilyname\r\n\r\n\r\n\r\n",
+        "size": 4,
+        "title": "Warranty status",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "In Warranty",
+              "color": "green"
+            },
+            {
+              "seriesName": "Out Of Warranty",
+              "color": "redBright"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "30",
+      "name": "query - 1",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Active\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend today=now()\r\n| extend RemainingDays=datetime_diff('day',EndDate,today)\r\n| summarize More1Year=countif(RemainingDays > 365 and RemainingDays < 730),More2Years=countif(RemainingDays > 730), Less1Year=countif(RemainingDays < 365),Less6Months=countif(RemainingDays < 180),Less3Months=countif(RemainingDays < 90),Less1Month=countif(RemainingDays < 30)\r\n| project ['> 2 years']=More2Years,['> 1 year']=More1Year,['< 1 year']=Less1Year,['< 6 months']=Less6Months,['< 3 months']=Less3Months,['< 1 month']=Less1Month",
+        "size": 4,
+        "title": "Number of days before end of warranty",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "> 2 years",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "success",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "> 1 year",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "success",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "< 1 year",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "success",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "< 6 months",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "warning",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "< 3 months",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "warning",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "< 1 month",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "error",
+                    "text": "{0}{1} devices"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "tileSettings": {
+          "showBorder": false
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "55",
+      "name": "query - 8",
+      "styleSettings": {
+        "maxWidth": "70",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Expired\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| summarize LenovoWarranty_CL = count() by ModelFamilyname\r\n| order by LenovoWarranty_CL",
+        "size": 1,
+        "title": "Devices with expired warranty (by model)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ModelFamilyname",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "LenovoWarranty_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Active\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| summarize LenovoWarranty_CL = count() by ModelFamilyname\r\n| order by LenovoWarranty_CL",
+        "size": 4,
+        "title": "Devices with active warranty (by model)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ModelFamilyname",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "LenovoWarranty_CL",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 9",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Expired\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| project DeviceName,ModelMTM,ModelFamilyname,User,['Warranty end date']=EndDate,['SerialNumber']=SN",
+        "size": 1,
+        "title": "Devices with expired warranty",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Active\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend today=now()\r\n| extend RemainingDays=datetime_diff('day',EndDate,today)\r\n| project DeviceName,ModelMTM,ModelFamilyname,User,['Warranty end date']=EndDate,['SerialNumber']=SN,['Days before end of warranty']=RemainingDays",
+        "size": 1,
+        "title": "Devices with active warranty",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Active\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend today=now()\r\n| extend RemainingDays=datetime_diff('day',EndDate,today)\r\n| where RemainingDays < 365\r\n| project DeviceName,ModelMTM,ModelFamilyname,User,['Warranty end date']=EndDate,['SerialNumber']=SN,['Days before end of warranty']=RemainingDays",
+        "size": 1,
+        "title": "Devices with warranty expired < 1 year",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 6",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoWarranty_CL\r\n| where IsActive == \"Active\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend today=now()\r\n| extend RemainingDays=datetime_diff('day',EndDate,today)\r\n| where RemainingDays < 31\r\n| project DeviceName,ModelMTM,ModelFamilyname,User,['Warranty end date']=EndDate,['SerialNumber']=SN,['Days before end of warranty']=RemainingDays",
+        "size": 1,
+        "title": "Devices with warranty expired < 1 month",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true,
+          "sortBy": [
+            {
+              "itemKey": "Days before end of warranty",
+              "sortOrder": 2
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "Days before end of warranty",
+            "sortOrder": 2
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 7",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
