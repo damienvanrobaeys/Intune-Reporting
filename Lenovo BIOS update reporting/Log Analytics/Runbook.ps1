@@ -60,9 +60,14 @@ ForEach($Device in $Lenovo_Devices)
         $Device_userDisplayName = $Device.userDisplayName        
 
         $Get_MTM = $Device_Model.Substring(0,4)                            
-        $Current_Model = ($Get_Models | where-object {($_ -like "*$Get_MTM*") -and ($_ -notlike "*-UEFI Lenovo*") -and ($_ -notlike "*dTPM*") -and ($_ -notlike "*Asset*") -and ($_ -notlike "*fTPM*")})[0]
-        $Device_Model = ($Current_Model.name.split("("))[0]  
-        $Device_Model = $Device_Model.trim()   
+        try{
+            $Current_Model = ($Get_Models | where-object {($_ -like "*$Get_MTM*") -and ($_ -notlike "*-UEFI Lenovo*") -and ($_ -notlike "*dTPM*") -and ($_ -notlike "*Asset*") -and ($_ -notlike "*fTPM*")})[0]
+            $Device_Model = ($Current_Model.name.split("("))[0]  
+            $Device_Model = $Device_Model.trim()   
+        }
+        catch {
+            $Current_Model = "Can not get the info"
+        } 
 
         $Current_Device_URL = "https://graph.microsoft.com/beta/deviceManagement/managedDevices/" + $Device_ID + "?`$select=hardwareInformation"
         $Current_Device_Info = Invoke-WebRequest -Uri $Current_Device_URL -Method GET -Headers $Headers -UseBasicParsing 
