@@ -183,7 +183,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where LastBIOSVersion == \"Multiple versions available\"\r\n| count",
+        "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where LastBIOSVersion == \"Multiple versions available\" or LastBIOSVersion == \"Can not get info\"\r\n| count",
         "size": 4,
         "title": "Devices with no BIOS info found",
         "timeContext": {
