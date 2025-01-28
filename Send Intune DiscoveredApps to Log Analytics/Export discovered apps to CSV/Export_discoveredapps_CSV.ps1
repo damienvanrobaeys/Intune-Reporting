@@ -10,6 +10,16 @@ $SharePoint_ExportFolder = ""  # folder where to upload file
 $CSV_DiscoveredApps_All = "DiscoveredApps_All.csv"
 $CSV_DiscoveredApps_Windows = "DiscoveredApps_Windows.csv"
 
+<#
+Now to get the ID of a SharePoint site proceed as below:
+1. Open your browser
+2. Type the following URL: 
+https://yoursharepoint.sharepoint.com/sites/yoursite/_api/site/id
+
+In my case it's:
+https://systanddeploy.sharepoint.com/sites/Support/_api/site/id
+#>
+
 $url = $env:IDENTITY_ENDPOINT  
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]" 
 $headers.Add("X-IDENTITY-HEADER", $env:IDENTITY_HEADER) 
