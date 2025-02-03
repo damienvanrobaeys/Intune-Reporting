@@ -1,0 +1,742 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Discovered apps installed on devices\r\n---\r\nThis report lists all apps installed on all Intune devices. \r\nTwo tabs are available:\r\n1. Resume: count of drivers by elements\r\n2. Details: details of drivers on devices\r\n\r\n**For a better result, filter by device name, model, manufacturer or class.**\r\n<br>\r\n**By filtering on device name, you will get below information for this device:**\r\n- All drivers installed\r\n- Drivers older than 2 years\r\n- Latest drivers installed duing last 2 months\r\n\r\n\r\n**&#9888; Note :** Drivers inventory is updated every days<br>",
+        "style": "info"
+      },
+      "name": "text - 15"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| project Time=format_datetime(TimeGenerated, \"MM/dd/yyyy hh:mm\")\r\n| summarize arg_max(Time,*)",
+        "size": 4,
+        "title": "Last data update",
+        "timeContext": {
+          "durationMs": 604800000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "card",
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "customWidth": "20",
+      "name": "query - 8",
+      "styleSettings": {
+        "maxWidth": "40"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL \r\n| summarize arg_max(TimeGenerated,*)\r\n| project hour=datetime_add('day',2,make_datetime(TimeGenerated))\r\n| project Time=format_datetime(hour, \"MM/dd/yyyy hh:mm\")",
+        "size": 4,
+        "title": "Next data update",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "card",
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "customWidth": "20",
+      "name": "query - 9",
+      "styleSettings": {
+        "maxWidth": "40"
+      }
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "7210cd17-06c0-4899-a63b-b61a7b9afa85",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Type device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ""
+          },
+          {
+            "id": "3496f651-35e2-4da0-8b73-c565f8da6558",
+            "version": "KqlParameterItem/1.0",
+            "name": "UserName",
+            "label": "Type user name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "865651f6-9363-40e0-886d-c4da6a8ff855",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Select a time range",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "value": {
+              "durationMs": 2592000000
+            }
+          },
+          {
+            "id": "336c0a64-6e64-495f-8118-2fc41e90a55b",
+            "version": "KqlParameterItem/1.0",
+            "name": "AppName",
+            "label": "Type app name",
+            "type": 1,
+            "value": ""
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 0"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "89ea9af9-7e3e-479e-9fd4-38a140bb287b",
+            "version": "KqlParameterItem/1.0",
+            "name": "ExactAppName",
+            "label": "Select application",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "Intune_DiscoveredApps_CL\r\n| where ApplicationName_s contains \"{AppName:escape}\"\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n//| where isnotempty(AppName)\r\n| distinct ApplicationName_s",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "id": "f5e5045c-3e3a-4f9a-badb-40a5e42d5b0f",
+            "version": "KqlParameterItem/1.0",
+            "name": "AppVersion",
+            "label": "Select version",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "Intune_DiscoveredApps_CL\r\n| where ApplicationName_s contains \"{AppName:escape}\"\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where isnotempty(ApplicationVersion_s)\r\n| distinct ApplicationVersion_s",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "value::all"
+            ]
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "AppName",
+        "comparison": "isNotEqualTo"
+      },
+      "name": "parameters - 2"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "cead14f7-a905-40ee-acb7-c8bdc2d218cc",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Apps resume",
+            "subTarget": "Resume",
+            "preText": "Resume",
+            "style": "link"
+          },
+          {
+            "id": "ea395b2d-38de-47a3-bff3-d1fcf11ac34a",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Device details",
+            "subTarget": "Details",
+            "preText": "Device details",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 7"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s,ApplicationVersion_s\r\n| where ApplicationName_s has_any ({ExactAppName})\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where isnotempty(ApplicationVersion_s)\r\n//| order by TimeGenerated\r\n//| project Date=TimeGenerated,Device=DeviceName_s,Application=ApplicationName_s,Version=ApplicationVersion_s\r\n| summarize Intune_DiscoveredApps_CL = count() by ApplicationName_s,ApplicationVersion_s\r\n| order by Intune_DiscoveredApps_CL\r\n| project Application=ApplicationName_s,Version=ApplicationVersion_s,['Devices count']=Intune_DiscoveredApps_CL\r\n",
+        "size": 1,
+        "title": "Devices count by version for this application",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "AppName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 6",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s//, ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n//| where DeviceName_s contains \"{ComputerName:escape}\"\r\n| where ApplicationName_s has_any ({ExactAppName})\r\n//| where ApplicationName_s contains \"{ComputerName:escape}\"\r\n//| where UserName_s contains \"{UserName:escape}\"\r\n| project Date=TimeGenerated,Device=DeviceName_s,Application=ApplicationName_s,Version=ApplicationVersion_s,User=UserName_s",
+        "size": 0,
+        "title": "Devices with this application",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "AppName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "IntuneDevices\r\n| where DeviceName contains \"{ComputerName:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| extend DateFormat = format_datetime(DeviceLastContact,\"MM-dd-yyyy hh:mm\")\r\n| project DateFormat",
+        "size": 4,
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "DateFormat",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "info",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "info",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "DateFormat",
+              "label": "Device last contact"
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "customWidth": "20",
+      "name": "query - 13",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s //, ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where DeviceName_s contains \"{ComputerName:escape}\"\r\n| count",
+        "size": 4,
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "info",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Count",
+              "label": "Applications count"
+            }
+          ]
+        },
+        "textSettings": {
+          "style": "bignumber"
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        }
+      ],
+      "customWidth": "20",
+      "name": "query - 12",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "IntuneDevices\r\n| where DeviceName contains \"{ComputerName:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| project UserName\r\n",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "UserName",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "info",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "UserName",
+              "label": "Primary user"
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "customWidth": "20",
+      "name": "query - 14",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s, ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where DeviceName_s contains \"{ComputerName:escape}\"\r\n//| where ApplicationName_s has_any ({ExactAppName})\r\n//| where ApplicationName_s contains \"{ExactAppName:escape}\"\r\n| where ApplicationName_s has_any ({ExactAppName})\r\n| count",
+        "size": 4,
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Count",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "info",
+                    "text": "{0}{1}  versions"
+                  }
+                ]
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Count",
+              "label": "Versions count"
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "AppName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "customWidth": "20",
+      "name": "query - 16",
+      "styleSettings": {
+        "maxWidth": "30",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s, ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where DeviceName_s contains \"{ComputerName:escape}\"\r\n| where UserName_s contains \"{UserName:escape}\"\r\n//| where ApplicationName_s has_any ({ExactAppName})\r\n//| where ApplicationName_s contains \"{ExactAppName:escape}\"\r\n//| where ApplicationName_s contains \"{AppName:escape}\"\r\n| where ApplicationName_s has_any ({ExactAppName})\r\n| project Date=TimeGenerated,Application=ApplicationName_s,Version=ApplicationVersion_s\r\n| limit 5000\r\n",
+        "size": 0,
+        "title": "Versions history for this application on the device",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "Application",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "Application",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ExactAppName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "AppName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s //, ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where DeviceName_s contains \"{ComputerName:escape}\"\r\n| where UserName_s contains \"{UserName:escape}\"\r\n| order by TimeGenerated\r\n| project Date=TimeGenerated,Application=ApplicationName_s,Version=ApplicationVersion_s",
+        "size": 1,
+        "title": "Apps installed on the device with last version",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "sortBy": [
+            {
+              "itemKey": "Application",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "Application",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        }
+      ],
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s,ApplicationVersion_s\r\n| where DeviceName_s contains \"{ComputerName:escape}\"\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where isnotempty(ApplicationVersion_s)\r\n| order by TimeGenerated\r\n| project Date=TimeGenerated,Application=ApplicationName_s,Version=ApplicationVersion_s\r\n",
+        "size": 0,
+        "title": "All installed apps history for the device",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "sortBy": [
+            {
+              "itemKey": "Application",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "Application",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "**Please select an application to get more info**",
+        "style": "warning"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "AppName",
+          "comparison": "isEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        }
+      ],
+      "name": "text - 10",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "**Please type a device name**",
+        "style": "warning"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        }
+      ],
+      "name": "text - 11",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Intune_DiscoveredApps_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, ApplicationName_s,ApplicationVersion_s\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(ApplicationName_s)\r\n| where isnotempty(ApplicationVersion_s)\r\n| summarize Intune_DiscoveredApps_CL = count() by ApplicationName_s,ApplicationVersion_s\r\n| order by Intune_DiscoveredApps_CL\r\n| project Application=ApplicationName_s,Version=ApplicationVersion_s,['Devices count']=Intune_DiscoveredApps_CL",
+        "size": 0,
+        "title": "Devices count by apps and versions",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 17",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/7f1fffa6-e07a-446b-bd04-d960d202cca2/resourceGroups/rgp-grt-dwpprd-telemetry/providers/Microsoft.OperationalInsights/workspaces/GRT-EVT"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
