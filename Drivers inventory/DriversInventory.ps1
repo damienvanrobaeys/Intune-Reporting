@@ -1,5 +1,6 @@
 # Log analytics part
-$LogType = "DriversInventory"
+$LogType_Inventory = "DriversInventory"
+$LogType_Translation = "DriversInventory_Translate"
 $CustomerId = "" # Log Analytics Workspace ID
 $SharedKey = '' # Log Analytics Workspace Primary Key
 $TimeStampField = ""
@@ -76,11 +77,66 @@ DeviceClass, DeviceID, manufacturer,InfName,Location
 # CONVERT ARRAY TO JSON
 $Drivers_Json = $PNPSigned_Drivers | ConvertTo-Json
 
+# Translating Windows Update Driver Names to Friendly Driver Names
+# Thanks to Trevor Jones for this 
+# https://smsagent.blog/2023/07/07/translating-windows-update-driver-names-to-friendly-driver-names/
+class Driver {
+    [string]$WUName 
+    [datetime]$InstallDate
+    [string]$DeviceName 
+    [string]$FriendlyName
+    [datetime]$DriverDate 
+    [string]$DriverVersion 
+    [string]$Manufacturer
+}
+$DriverList = [System.Collections.Generic.List[Driver]]::new()
+$InstalledDrivers = Get-Package -ProviderName msu | where {$_.Metadata.Item("SupportUrl") -match "target=hub"}
+foreach($InstalledDriver in $InstalledDrivers)
+{
+    $Driver = [Driver]::new()
+    $Driver.WUName = $InstalledDriver.Name
+    $Driver.InstallDate = [DateTime]::Parse($InstalledDriver.Metadata.Item("Date"))
+    $DeviceDriver = Get-CimInstance -ClassName Win32_PnPSignedDriver -Filter "DriverVersion = '$($InstalledDriver.Name.Split()[-1])'" | 
+        Select -First 1 | 
+        Select DeviceName,FriendlyName,DriverDate,DriverVersion,Manufacturer
+    If ($DeviceDriver)
+    {
+        try { $DriverDate = [DateTime]::Parse($DeviceDriver.DriverDate) }catch { $DriverDate = $DeviceDriver.DriverDate }
+        $Driver.DeviceName = $DeviceDriver.DeviceName
+        $Driver.DeviceName = $DeviceDriver.DeviceName		
+        $Driver.FriendlyName = $DeviceDriver.FriendlyName
+        $Driver.DriverDate = $DriverDate
+        $Driver.DriverVersion = $DeviceDriver.DriverVersion
+        $Driver.Manufacturer = $DeviceDriver.Manufacturer
+        $DriverList.Add($Driver)
+    }  
+}
+
+$Drivers_Translate = $DriverList | select-object @{Label="DeviceName";Expression={$env:computername}},`
+@{Label="ModelFriendlyName";Expression={$Model_FriendlyName}},`
+@{Label="DeviceManufacturer";Expression={$Manufacturer}},`
+@{Label="Model";Expression={$Model}},`
+@{Label="WUName";Expression={$_.WUName}},`
+@{Label="DriverName";Expression={$_.DeviceName}},`
+@{Label="DriverFriendlyName";Expression={$_.FriendlyName}},`
+@{Label="DriverManufacturer";Expression={$_.Manufacturer}},DriverVersion,DriverDate
+
+# CONVERT ARRAY TO JSON
+$DriverList_Translation_Json = $Drivers_Translate | ConvertTo-Json
+
 # SEND JSON CONTENT TO LOG ANALYTICS
 $params = @{
 	CustomerId = $customerId
 	SharedKey  = $sharedKey
 	Body       = ([System.Text.Encoding]::UTF8.GetBytes($Drivers_Json))
-	LogType    = $LogType 
+	LogType    = $LogType_Inventory 
+}
+$LogResponse = Post-LogAnalyticsData @params	
+
+$params = @{
+	CustomerId = $customerId
+	SharedKey  = $sharedKey
+	Body       = ([System.Text.Encoding]::UTF8.GetBytes($DriverList_Translation_Json))
+	LogType    = $LogType_Translation 
 }
 $LogResponse = Post-LogAnalyticsData @params	
