@@ -735,8 +735,5 @@
       }
     }
   ],
-  "fallbackResourceIds": [
-    "/subscriptions/7f1fffa6-e07a-446b-bd04-d960d202cca2/resourceGroups/rgp-grt-dwpprd-telemetry/providers/Microsoft.OperationalInsights/workspaces/GRT-EVT"
-  ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
