@@ -1,6 +1,7 @@
 # Log analytics part
 $LogType_Inventory = "DriversInventory"
 $LogType_Translation = "DriversInventory_Translate"
+$LogType_Optional_Updates = "OptionalUpdates"
 $CustomerId = "" # Log Analytics Workspace ID
 $SharedKey = '' # Log Analytics Workspace Primary Key
 $TimeStampField = ""
@@ -57,11 +58,9 @@ $Model = $win32_computersystem.Model
 If($Manufacturer -like "*lenovo*")
 	{
 		$Model_FriendlyName = $win32_computersystem.SystemFamily
-		$Get_Current_Model =  $Model.Substring(0,4)
 	}Else
 	{
 		$Model_FriendlyName = $Model
-		$Get_Current_Model = $Model_FriendlyName
 	}	
 
 # COLLECT DRIVERS IN ARRAY
@@ -111,7 +110,6 @@ foreach($InstalledDriver in $InstalledDrivers)
         $DriverList.Add($Driver)
     }  
 }
-
 $Drivers_Translate = $DriverList | select-object @{Label="DeviceName";Expression={$env:computername}},`
 @{Label="ModelFriendlyName";Expression={$Model_FriendlyName}},`
 @{Label="DeviceManufacturer";Expression={$Manufacturer}},`
@@ -123,6 +121,29 @@ $Drivers_Translate = $DriverList | select-object @{Label="DeviceName";Expression
 
 # CONVERT ARRAY TO JSON
 $DriverList_Translation_Json = $Drivers_Translate | ConvertTo-Json
+
+# COLLECT OPTIOBAL UPDATES IN ARRAY
+class OptionalWU {
+    [string]$WUName 
+    [string]$DeviceName 
+    [string]$ModelFriendlyName
+    [string]$DeviceManufacturer
+    [string]$DeviceModel
+}
+$OptionalWUList = [System.Collections.Generic.List[OptionalWU]]::new()
+$Optional_Updates = Get-WUList 
+ForEach($Update in $Optional_Updates)
+{
+    $OptionalWU = [OptionalWU]::new()
+    $OptionalWU.WUName = $Update.Title
+	$OptionalWU.DeviceName = $env:computername
+	$OptionalWU.ModelFriendlyName = $Model_FriendlyName
+	$OptionalWU.DeviceManufacturer = $Manufacturer
+	$OptionalWU.DeviceModel = $Model
+	$OptionalWUList.Add($OptionalWU)
+} 
+# CONVERT ARRAY TO JSON
+$Optional_Updates_Inventory_Json = $OptionalWUList | ConvertTo-Json
 
 # SEND JSON CONTENT TO LOG ANALYTICS
 $params = @{
@@ -138,5 +159,13 @@ $params = @{
 	SharedKey  = $sharedKey
 	Body       = ([System.Text.Encoding]::UTF8.GetBytes($DriverList_Translation_Json))
 	LogType    = $LogType_Translation 
+}
+$LogResponse = Post-LogAnalyticsData @params	
+
+$params = @{
+	CustomerId = $customerId
+	SharedKey  = $sharedKey
+	Body       = ([System.Text.Encoding]::UTF8.GetBytes($Optional_Updates_Inventory_Json))
+	LogType    = $LogType_Optional_Updates 
 }
 $LogResponse = Post-LogAnalyticsData @params	

@@ -686,6 +686,35 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
+        "query": "OptionalUpdates_CL\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where isnotempty(WUName_s)\r\n| summarize arg_max(TimeGenerated,*) by WUName_s\r\n| project ['Windows Update package']=WUName_s,Date=TimeGenerated\r\n",
+        "size": 1,
+        "title": "Optional updates available for this device",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "query - 29",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
         "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(DriverDate_value_t)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where DriverDate_value_t > ago(60d)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project ['Device name']=DeviceName_s,['Driver name']=DriverName_s,['Driver version']=DriverVersion_s,['Driver date']=format_datetime(DriverDate_value_t, \"dd/MM/yyyy\"),Class=DeviceClass_s",
         "size": 1,
         "title": "Last drivers installed for a device (last 2 months)",
