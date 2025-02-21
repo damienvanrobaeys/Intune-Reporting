@@ -122,28 +122,33 @@ $Drivers_Translate = $DriverList | select-object @{Label="DeviceName";Expression
 # CONVERT ARRAY TO JSON
 $DriverList_Translation_Json = $Drivers_Translate | ConvertTo-Json
 
-# COLLECT OPTIOBAL UPDATES IN ARRAY
-class OptionalWU {
-    [string]$WUName 
-    [string]$DeviceName 
-    [string]$ModelFriendlyName
-    [string]$DeviceManufacturer
-    [string]$DeviceModel
-}
-$OptionalWUList = [System.Collections.Generic.List[OptionalWU]]::new()
-$Optional_Updates = Get-WUList 
-ForEach($Update in $Optional_Updates)
-{
-    $OptionalWU = [OptionalWU]::new()
-    $OptionalWU.WUName = $Update.Title
-	$OptionalWU.DeviceName = $env:computername
-	$OptionalWU.ModelFriendlyName = $Model_FriendlyName
-	$OptionalWU.DeviceManufacturer = $Manufacturer
-	$OptionalWU.DeviceModel = $Model
-	$OptionalWUList.Add($OptionalWU)
-} 
+# GETTING INFO ABOUT OPTIONAL UPDATES
+$updateSession = New-Object -ComObject Microsoft.Update.Session
+$updateSearcher = $updateSession.CreateUpdateSearcher()
+$searchResult = $updateSearcher.Search("IsInstalled=0 AND Type='Driver'")
+$OptionalWUList = @()
+If($searchResult.Updates.Count -gt 0) 
+	{
+		For($i = 0; $i -lt $searchResult.Updates.Count; $i++) 
+			{
+				$update = $searchResult.Updates.Item($i)
+				$OptionalWUList += [PSCustomObject]@{
+					Title            = $update.Title
+					Description      = $update.Description
+					DriverClass      = $update.DriverClass
+					DriverModel      = $update.DriverModel
+					DriverChangeTime = $update.LastDeploymentChangeTime
+				}
+			}
+	}
+
+$Optional_Drivers = $OptionalWUList | select-object @{Label="DeviceName";Expression={$env:computername}},`
+@{Label="ModelFriendlyName";Expression={$Model_FriendlyName}},`
+@{Label="DeviceManufacturer";Expression={$Manufacturer}},`
+@{Label="Model";Expression={$Model}},Title,Description,DriverClass,DriverModel,DriverChangeTime
+
 # CONVERT ARRAY TO JSON
-$Optional_Updates_Inventory_Json = $OptionalWUList | ConvertTo-Json
+$Optional_Updates_Inventory_Json = $Optional_Drivers | ConvertTo-Json
 
 # SEND JSON CONTENT TO LOG ANALYTICS
 $params = @{

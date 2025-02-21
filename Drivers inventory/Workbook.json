@@ -271,7 +271,7 @@
         "query": "IntuneDevices\r\n| where DeviceName contains \"{ComputerName:escape}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| extend DateFormat = format_datetime(DeviceLastContact,\"MM-dd-yyyy hh:mm\")\r\n| join DriversInventory_Translate_CL on $right.DeviceName_s == $left.DeviceName\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| project ['Device last contact']=DateFormat,['Primary user']=UserName,Model=Model,['Model friendly name']=ModelFriendlyName_s",
         "size": 4,
         "timeContext": {
-          "durationMs": 86400000
+          "durationMs": 2592000000
         },
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -380,7 +380,7 @@
                     "operator": "Default",
                     "thresholdValue": null,
                     "representation": "1",
-                    "text": "{0}{1} postes"
+                    "text": "{0}{1} devices"
                   }
                 ],
                 "customColumnWidthSetting": "20%"
@@ -447,7 +447,7 @@
                     "operator": "Default",
                     "thresholdValue": null,
                     "representation": "1",
-                    "text": "{0}{1} modèles"
+                    "text": "{0}{1} models"
                   }
                 ]
               }
@@ -496,7 +496,7 @@
                     "operator": "Default",
                     "thresholdValue": null,
                     "representation": "1",
-                    "text": "{0}{1} constructeurs"
+                    "text": "{0}{1} manufacturers"
                   }
                 ]
               }
@@ -659,7 +659,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_t\r\n| limit 5000\r\n",
+        "query": "DriversInventory_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s, DriverName_s, DriverVersion_s\r\n| where isnotempty(ModelFriendlyName_s)\r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(DriverName_s)\r\n| where ModelFriendlyName_s has_any ({Models})\r\n| where DeviceClass_s has_any ({Class})\r\n| extend DriverDate_value_Formated = format_datetime(DriverDate_value_t, 'yyyy-M-dd')\r\n| project Model=ModelFriendlyName_s, ['Driver name']=DriverName_s, ['Driver version']=DriverVersion_s, ['Driver date']=DriverDate_value_Formated\r\n| limit 5000\r\n",
         "size": 1,
         "title": "Drivers installed per models",
         "timeContext": {
@@ -686,7 +686,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "OptionalUpdates_CL\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where isnotempty(WUName_s)\r\n| summarize arg_max(TimeGenerated,*) by WUName_s\r\n| project ['Windows Update package']=WUName_s,Date=TimeGenerated\r\n",
+        "query": "OptionalUpdates_CL\r\n| where isnotempty(Title_s)\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where isnotempty(Title_s)\r\n| summarize arg_max(TimeGenerated,*) by Title_s\r\n| extend DriverChangeTimeFormated = format_datetime(DriverChangeTime_t, 'yyyy-M-dd')\r\n| project ['Last script execution']=TimeGenerated,['Update package']=Title_s,Class=DriverClass_s,['Driver model']=DriverModel_s,['Driver change time']=DriverChangeTimeFormated,Description=Description_s\r\n",
         "size": 1,
         "title": "Optional updates available for this device",
         "timeContext": {
@@ -1322,6 +1322,119 @@
         }
       ],
       "name": "query - 24",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices count by optional update available and model",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "c032fc34-ce6e-4a0f-98d1-771ba9deee7b",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "OptionalDriverClass",
+                  "label": "Filter by class",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "query": "OptionalUpdates_CL\r\n| where isnotempty(DriverClass_s)\r\n| distinct DriverClass_s\r\n",
+                  "typeSettings": {
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ]
+                  },
+                  "timeContext": {
+                    "durationMs": 2592000000
+                  },
+                  "queryType": 0,
+                  "resourceType": "microsoft.operationalinsights/workspaces",
+                  "value": []
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "parameters - 31"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "OptionalUpdates_CL\r\n| where isnotempty(Title_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s,Title_s\r\n| where DriverClass_s has_any ({OptionalDriverClass})\r\n| summarize ['Devices count'] = count() by Model=ModelFriendlyName_s,['Package']=Title_s\r\n| order by ['Devices count']",
+              "size": 1,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "Resume"
+              },
+              {
+                "parameterName": "OptionalUpdates_CL",
+                "comparison": "isNotEqualTo",
+                "value": "\"\""
+              },
+              {
+                "parameterName": "OptionalDriverClass",
+                "comparison": "isNotEqualTo"
+              }
+            ],
+            "name": "query - 30",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "Filter on driver class to get result",
+              "style": "info"
+            },
+            "conditionalVisibility": {
+              "parameterName": "OptionalDriverClass",
+              "comparison": "isEqualTo"
+            },
+            "name": "text - 2",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "OptionalUpdates_CL",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        }
+      ],
+      "name": "group - 32",
       "styleSettings": {
         "showBorder": true
       }
