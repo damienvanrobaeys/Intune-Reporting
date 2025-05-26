@@ -1,0 +1,694 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Entra ID group inspector\r\n---\r\nThis report lists all actions exeuted on Entra ID groups.\r\n<br>\r\nThree tabs are available:\r\n1. Creation/Deletion: info about groups created or deleted\r\n2. Members: Members added to a group or removed from a group\r\n3. Owners: Owners added to a group or removed from a group\r\n\r\n**For a better result, filter by group name**",
+        "style": "info"
+      },
+      "name": "text - 6"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "019a0d61-70c6-4808-887d-ec6d9aefcf8f",
+            "version": "KqlParameterItem/1.0",
+            "name": "WorkspaceName",
+            "type": 1,
+            "query": "resources\r\n| where name contains \"{WorkspaceName]\" and type == \"microsoft.operationalinsights/workspaces\"\r\n| project name",
+            "isHiddenWhenLocked": true,
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources",
+            "value": ""
+          },
+          {
+            "id": "ce6100df-6982-49a6-a810-477bc0fb4f7e",
+            "version": "KqlParameterItem/1.0",
+            "name": "GroupName",
+            "label": "Group name",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| where Identity notcontains \"Microsoft Teams\" and Identity notcontains \"Office 365\" and Identity <> \"Viva Engage\"\r\n| where OperationName has_any (\"Add member\",\"Remove member\")\r\n| extend GroupName=case(\r\nOperationName contains \"Add member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].newValue))),\r\nOperationName contains \"Remove member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].oldValue))),\r\n\"Unnown\")\r\n| distinct GroupName",
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": null
+          },
+          {
+            "id": "1a937b04-3fc3-468e-9fe5-87c55b8554c3",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time range",
+            "type": 4,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "value": {
+              "durationMs": 604800000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "Click on Edit then type the workspace name in the WorkspaceName parameter !!!",
+        "style": "warning"
+      },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isEqualTo"
+      },
+      "name": "text - 7",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "96e7c537-2e1f-4341-b5e5-eb57f274c4d0",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Creation/Deletion",
+            "subTarget": "Audit",
+            "style": "link"
+          },
+          {
+            "id": "22038225-4927-4598-a120-916105fc533f",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Members",
+            "subTarget": "Members",
+            "style": "link"
+          },
+          {
+            "id": "b3338038-c5a5-48a3-b810-9fc5939be905",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Owners",
+            "subTarget": "Owners",
+            "style": "link"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
+      },
+      "name": "links - 5"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName contains \"Add group\" or OperationName == \"Delete group\"\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend GroupName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| summarize Actions_count = count() by OperationName\r\n//| project Date=ActivityDateTime,Action=OperationName,Group=GroupName,By=ExecutedUser",
+        "size": 4,
+        "title": "Audit count",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Delete group",
+              "label": "Groups deleted"
+            },
+            {
+              "seriesName": "Add group",
+              "label": "Groups created"
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Audit"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "customWidth": "50",
+      "name": "query - 8",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Groups audit",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "98fcb773-3127-4334-982e-df5a3549d039",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "GroupSate",
+                  "label": "Action",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "typeSettings": {
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"Add group\", \"label\":\"Add group\" , \"selected\":true},\r\n    { \"value\":\"Delete group\", \"label\":\"Delete group\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "defaultValue": "value::all",
+                  "value": [
+                    "value::all"
+                  ]
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName contains \"Add group\" or OperationName == \"Delete group\"\r\n| where OperationName has_any ({GroupSate})\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend GroupName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| project Date=ActivityDateTime,Action=OperationName,Group=GroupName,By=ExecutedUser",
+              "size": 0,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Action",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Add",
+                          "representation": "Add",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Delete",
+                          "representation": "Delete",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "filter": true
+              }
+            },
+            "name": "query - 4",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Audit"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "group_mainaudit",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName contains \"Add member\" or OperationName contains \"Remove member\"\r\n| extend GroupName=case(\r\nOperationName contains \"Add member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].newValue))),\r\nOperationName contains \"Remove member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].oldValue))),\r\n\"Unnown\")\r\n| where GroupName has_any ({GroupName})\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend ItemType = tostring(TargetResources.type)\r\n| where ItemType contains \"User\" or ItemType contains \"Device\" \r\n| extend UserName = tostring(TargetResources.userPrincipalName),DeviceName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend Item=case(\r\nisnotempty(UserName), UserName,\r\nisnotempty(DeviceName), DeviceName,\r\n\"Unnown\")\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), userPrincipalName,\r\nisempty(userPrincipalName), Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| summarize Members_Actions_count = count() by OperationName\r\n",
+        "size": 4,
+        "title": "Members audit count",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Add member to group",
+              "label": "Members added"
+            },
+            {
+              "seriesName": "Remove member from group",
+              "label": "Members removed"
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "GroupName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Members"
+        }
+      ],
+      "customWidth": "50",
+      "name": "query - 9",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Group members details",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "61cfffa6-6ce2-4d62-950a-5b73c2cdab2b",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "GroupAction",
+                  "label": "Action",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "typeSettings": {
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"Add member\", \"label\":\"Add member\" , \"selected\":true},\r\n    { \"value\":\"Remove member\", \"label\":\"Remove member\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 2592000000
+                  },
+                  "defaultValue": "value::all"
+                },
+                {
+                  "id": "e9fdf46b-35e2-4d17-b117-29a695905049",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "Type",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| where Identity notcontains \"Microsoft Teams\" and Identity notcontains \"Office 365\" and Identity <> \"Viva Engage\"\r\n| where OperationName has_any (\"Add member\",\"Remove member\")\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend ItemType = tostring(TargetResources.type)\r\n| distinct ItemType",
+                  "typeSettings": {
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ],
+                    "showDefault": false
+                  },
+                  "timeContext": {
+                    "durationMs": 2592000000
+                  },
+                  "defaultValue": "value::all",
+                  "queryType": 0,
+                  "resourceType": "microsoft.operationalinsights/workspaces",
+                  "value": null
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 4"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName has_any ({GroupAction})\r\n| where OperationName contains \"Add member\" or OperationName contains \"Remove member\"\r\n| extend GroupName=case(\r\nOperationName contains \"Add member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].newValue))),\r\nOperationName contains \"Remove member\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].oldValue))),\r\n\"Unnown\")\r\n| where GroupName has_any ({GroupName})\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend ItemType = tostring(TargetResources.type)\r\n| where ItemType contains \"User\" or ItemType contains \"Device\" \r\n| where ItemType has_any ({Type})\r\n| extend UserName = tostring(TargetResources.userPrincipalName),DeviceName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend Item=case(\r\nisnotempty(UserName), UserName,\r\nisnotempty(DeviceName), DeviceName,\r\n\"Unnown\")\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), userPrincipalName,\r\nisempty(userPrincipalName), Identity,\r\n\"Unnown\")\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| project Date=ActivityDateTime,['Target group']=GroupName,Action=OperationName,['Item type']=ItemType,['Item name']=Item,['Added by']=ExecutedUser\r\n| order by Date",
+              "size": 0,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Action",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Add",
+                          "representation": "dot-green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Remove",
+                          "representation": "dot-redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "Item type",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "User",
+                          "representation": "Person",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Device",
+                          "representation": "Initial_Access",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "GroupName",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "query - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "GroupName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Members"
+        }
+      ],
+      "name": "group _members",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "Please select a group",
+        "style": "warning"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "GroupName",
+          "comparison": "isEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isNotEqualTo",
+          "value": "Audit"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "text - 3",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName contains \"Add owner to group\" or OperationName contains \"Remove owner from group\"\r\n| extend GroupName=case(\r\nOperationName contains \"Add owner\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].newValue))),\r\nOperationName contains \"Remove owner\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].oldValue))),\r\n\"Unknown\")\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend UserName = tostring(TargetResources.userPrincipalName),DeviceName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend Item=case(\r\nisnotempty(UserName), UserName,\r\nisnotempty(DeviceName), DeviceName,\r\n\"Unknown\")\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unknown\")\r\n| where GroupName has_any ({GroupName})\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| where Item !contains \"Unknown\"\r\n| summarize Owners_Actions_count = count() by OperationName\r\n",
+        "size": 4,
+        "title": "Owners audit count",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Add owner to group",
+              "label": "Add owner "
+            },
+            {
+              "seriesName": "Remove owner from group",
+              "label": "Remove owner "
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "GroupName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Owners"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "customWidth": "50",
+      "name": "query - 10",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Group owners details",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "b5e904a9-326a-41a4-ac91-9b53fa303fdd",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "OwnerAction",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "typeSettings": {
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"Add owner\", \"label\":\"Add owner\" , \"selected\":true},\r\n    { \"value\":\"Remove owner\", \"label\":\"Remove owner\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "defaultValue": "value::all",
+                  "value": [
+                    "value::all"
+                  ],
+                  "label": "Action"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "workspace(\"{WorkspaceName:label}\").AuditLogs \r\n| where Category contains \"GroupManagement\"\r\n| where Identity <> \"Microsoft Teams Services\" //or Identity <> \"Microsoft Substrate Management\"\r\n| where OperationName contains \"Add owner to group\" or OperationName contains \"Remove owner from group\"\r\n| where OperationName has_any ({OwnerAction})\r\n| extend GroupName=case(\r\nOperationName contains \"Add owner\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].newValue))),\r\nOperationName contains \"Remove owner\",  Group=tostring(parse_json(tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[1].oldValue))),\r\n\"Unknown\")\r\n| extend TargetResources = parse_json(TargetResources)\r\n| mv-expand TargetResources\r\n| extend UserName = tostring(TargetResources.userPrincipalName),DeviceName = tostring(TargetResources.displayName)\r\n| extend JSON_Content=parse_json(InitiatedBy)\r\n| extend userPrincipalName=JSON_Content.user.userPrincipalName\r\n| extend Item=case(\r\nisnotempty(UserName), UserName,\r\nisnotempty(DeviceName), DeviceName,\r\n\"Unknown\")\r\n| extend ExecutedUser=case(\r\nisnotempty(userPrincipalName), Usertest=userPrincipalName,\r\nisempty(userPrincipalName), Usertest=Identity,\r\n\"Unknown\")\r\n| where GroupName has_any ({GroupName})\r\n| where ExecutedUser <> \"Microsoft Substrate Management\"\r\n| where Item !contains \"Unknown\"\r\n| project Date=ActivityDateTime,['Target group']=GroupName,Action=OperationName,['Owner name']=Item,['Added by']=ExecutedUser\r\n",
+              "size": 0,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Action",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Add owner",
+                          "representation": "dot-lightBlue",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Remove owner",
+                          "representation": "dot-orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "query - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "GroupName",
+          "comparison": "isNotEqualTo"
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Owners"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
+      "name": "group_owners",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
