@@ -4,7 +4,7 @@
     {
       "type": 1,
       "content": {
-        "json": "## Entra ID group inspector\r\n---\r\nThis report lists all actions exeuted on Entra ID groups.\r\n<br>\r\nThree tabs are available:\r\n1. Creation/Deletion: info about groups created or deleted\r\n2. Members: Members added to a group or removed from a group\r\n3. Owners: Owners added to a group or removed from a group\r\n\r\n**For a better result, filter by group name**",
+        "json": "## Entra ID group inspector\r\n---\r\nThis report lists all actions executed on Entra ID groups.\r\n<br>\r\nThree tabs are available:\r\n1. Creation/Deletion: info about groups created or deleted\r\n2. Members: Members added to a group or removed from a group\r\n3. Owners: Owners added to a group or removed from a group\r\n\r\n**For a better result, filter by group name**",
         "style": "info"
       },
       "name": "text - 6"
