@@ -1,0 +1,525 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Windows authentication usage dashboard\r\n---\r\nThis workbook allows you to know:\r\n- Number of people using a password for Windows authentication\r\n- Number of people using WHFB for Windows authentication\r\n- Who use password vs Windows Hello for Business (WHFB)\r\n- Who use both password and WHFB\r\n- Usage evolution of WHFB or password over time\r\n<br>\r\n\r\nYou can filter on:\r\n- Device name nor user name\r\n- Windows authentication activity (by default last 3 days)\r\n- Show last connexion for a user vs show all connexions\r\n\r\n",
+        "style": "info"
+      },
+      "name": "text - 8"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "5f544a1b-ae2c-4c5a-861b-fc82a98bb1cd",
+            "version": "KqlParameterItem/1.0",
+            "name": "WorkspaceName",
+            "type": 1,
+            "isRequired": true,
+            "query": "resources\r\n| where name contains \"{WorkspaceName]\" and type == \"microsoft.operationalinsights/workspaces\"\r\n| project name",
+            "isHiddenWhenLocked": true,
+            "queryType": 1,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": ""
+          },
+          {
+            "id": "dbe1409f-d95d-435d-8563-1e5b0fb5a2f5",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Activity",
+            "type": 4,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ],
+              "allowCustom": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": {
+              "durationMs": 259200000
+            }
+          },
+          {
+            "id": "74e5fe7b-5143-43fb-93b3-f57380152e41",
+            "version": "KqlParameterItem/1.0",
+            "name": "Display",
+            "type": 2,
+            "isRequired": true,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"All\", \"label\":\"All connexion by user\" },\r\n    { \"value\":\"Last\", \"label\":\"Last connexion by user\", \"selected\":true}\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "label": "Show me"
+          },
+          {
+            "id": "0b10ab7a-bcf9-4d5a-8818-db78f9adeb77",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ""
+          },
+          {
+            "id": "0b3aa494-b352-4cce-8911-00af793ce399",
+            "version": "KqlParameterItem/1.0",
+            "name": "UserName",
+            "label": "User name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": ""
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 3"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Global counters",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Data = workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId;\r\n\r\nlet BytrustType = Data\r\n| summarize Count = count() by trustType;\r\n\r\nlet Total = BytrustType\r\n| summarize Count = sum(Count)\r\n| extend trustType = \"TOTAL\";\r\n\r\nBytrustType\r\n| union Total\r\n| order by Count asc",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "trustType",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Hybrid Azure AD joined",
+                          "representation": "dot-turquoise",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Azure AD joined",
+                          "representation": "dot-pink",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "trustType",
+                    "label": "Type"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 2",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let UniqueUsers = \r\n    workspace(\"{WorkspaceName:label}\").SigninLogs \r\n    | where AppDisplayName contains \"Windows Sign In\"\r\n    | where ResultSignature == \"SUCCESS\"\r\n    | extend UserId = tostring(UserId)\r\n    | extend deviceId = tostring(DeviceDetail.deviceId)\r\n    | extend isManaged = tostring(DeviceDetail.isManaged)\r\n    | where isManaged == \"true\"\r\n    | summarize dcount(UserId);\r\nlet UniqueDevices = \r\n    workspace(\"{WorkspaceName:label}\").SigninLogs \r\n    | where AppDisplayName contains \"Windows Sign In\"\r\n    | where ResultSignature == \"SUCCESS\"\r\n    | extend UserId = tostring(UserId)\r\n    | extend deviceId = tostring(DeviceDetail.deviceId)\r\n    | extend isManaged = tostring(DeviceDetail.isManaged)\r\n    | where isManaged == \"true\"\r\n    | summarize dcount(deviceId);\r\nprint [' Unique devices'] = toscalar(UniqueDevices), [' Unique users'] = toscalar(UniqueUsers)",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "30",
+            "name": "query - 1",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "name": "global count"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Authentication methods count",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Data = workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId;\r\n\r\nlet ByMethod = Data\r\n| summarize Count = count() by Method;\r\n\r\nlet Total = ByMethod\r\n| summarize Count = sum(Count)\r\n| extend Method = \"TOTAL\";\r\n\r\nByMethod\r\n| union Total\r\n| order by Count asc",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "sortBy": [
+                  {
+                    "itemKey": "Count",
+                    "sortOrder": 1
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "Count",
+                  "sortOrder": 1
+                }
+              ]
+            },
+            "customWidth": "30",
+            "name": "query - 6",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "workspace(\"{WorkspaceName:label}\").SigninLogs\r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId\r\n| summarize Count = count() by Method\r\n| extend Total = toscalar(\r\n    workspace(\"{WorkspaceName:label}\").SigninLogs\r\n    | where AppDisplayName contains \"Windows Sign In\"\r\n    | where ResultSignature == \"SUCCESS\"\r\n    | extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n    | extend deviceId = tostring(DeviceDetail.deviceId)\r\n    | extend isManaged = tostring(DeviceDetail.isManaged)\r\n    | where isManaged == \"true\"\r\n    | summarize arg_max(TimeGenerated,*) by deviceId\r\n    | summarize TotalCount = count()\r\n)\r\n| extend Percentage = round(100.0 * Count / Total, 2)\r\n| project Method, Percentage",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "table"
+            },
+            "customWidth": "30",
+            "name": "query - 6",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "name": "group - 7"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Authentication methods count for Azure AD joined devices",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Data = workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| where trustType == \"Azure AD joined\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId;\r\n\r\nlet ByMethod = Data\r\n| summarize Count = count() by Method;\r\n\r\nlet Total = ByMethod\r\n| summarize Count = sum(Count)\r\n| extend Method = \"TOTAL\";\r\n\r\nByMethod\r\n| union Total\r\n| order by Count asc",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "30",
+            "name": "query - 0",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "workspace(\"{WorkspaceName:label}\").SigninLogs\r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| where trustType == \"Azure AD joined\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId\r\n| summarize Count = count() by Method\r\n| extend Total = toscalar(\r\n    workspace(\"{WorkspaceName:label}\").SigninLogs\r\n    | where AppDisplayName contains \"Windows Sign In\"\r\n    | where ResultSignature == \"SUCCESS\"\r\n    | extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n    | extend deviceId = tostring(DeviceDetail.deviceId)\r\n    | extend isManaged = tostring(DeviceDetail.isManaged)\r\n    | where isManaged == \"true\"\r\n    | extend trustType = tostring(DeviceDetail.trustType)\r\n    | where trustType == \"Azure AD joined\"    \r\n    | summarize arg_max(TimeGenerated,*) by deviceId\r\n    | summarize TotalCount = count()\r\n)\r\n| extend Percentage = round(100.0 * Count / Total, 2)\r\n| project Method, Percentage",
+              "size": 4,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "30",
+            "name": "query - 1",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "name": "group - 8"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Usage of Windows Hello over time",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "79f3954d-6e2d-40d8-9721-25e642729196",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "WHFBActivity",
+                  "label": "Time range",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"30\", \"label\":\"Last month\" },\r\n    { \"value\":\"60\", \"label\":\"Last 2 months\"},\r\n    { \"value\":\"90\", \"label\":\"Last 3 months\"},\r\n    { \"value\":\"180\", \"label\":\"Last 6 months\", \"selected\":true},\r\n    { \"value\":\"240\", \"label\":\"Last 8 months\"},\r\n    { \"value\":\"365\", \"label\":\"Last year\"},\r\n    { \"value\":\"730\", \"label\":\"Last 2 years\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let startDate = startofmonth(ago({WHFBActivity}d));\r\nworkspace(\"{WorkspaceName:label}\").SigninLogs\r\n| where TimeGenerated >= startDate\r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| where Method in (\"Password\", \"Windows Hello for Business\")\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| where isManaged == \"true\"\r\n| extend Month = startofmonth(TimeGenerated)\r\n| summarize arg_max(TimeGenerated, *) by deviceId, Method, Month\r\n| summarize Count = count() by Month, Method\r\n| summarize PasswordCount = sumif(Count, Method == \"Windows Hello for Business\"), TotalCount = sum(Count) by Month\r\n| extend Percentage = round(100.0 * todouble(PasswordCount) / todouble(TotalCount), 2)\r\n| project Month, Percentage\r\n| render timechart",
+              "size": 0,
+              "aggregation": 2,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "timechart",
+              "tileSettings": {
+                "showBorder": false
+              }
+            },
+            "name": "query - 0"
+          }
+        ]
+      },
+      "name": "WHFB evolution",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Usage of password over time",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "22b6e1a7-e128-4904-a883-740b75002a2f",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "PasswordActivity",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"30\", \"label\":\"Last month\" },\r\n    { \"value\":\"60\", \"label\":\"Last 2 months\"},\r\n    { \"value\":\"90\", \"label\":\"Last 3 months\"},\r\n    { \"value\":\"180\", \"label\":\"Last 6 months\", \"selected\":true},\r\n    { \"value\":\"240\", \"label\":\"Last 8 months\"},\r\n    { \"value\":\"365\", \"label\":\"Last year\"},\r\n    { \"value\":\"730\", \"label\":\"Last 2 years\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "label": "Time range"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let startDate = startofmonth(ago({PasswordActivity}d));\r\nworkspace(\"{WorkspaceName:label}\").SigninLogs\r\n| where TimeGenerated >= startDate\r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| where Method in (\"Password\", \"Windows Hello for Business\")\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| where isManaged == \"true\"\r\n| extend Month = startofmonth(TimeGenerated)\r\n| summarize arg_max(TimeGenerated, *) by deviceId, Method, Month\r\n| summarize Count = count() by Month, Method\r\n| summarize PasswordCount = sumif(Count, Method == \"Password\"), TotalCount = sum(Count) by Month\r\n| extend Percentage = round(100.0 * todouble(PasswordCount) / todouble(TotalCount), 2)\r\n| project Month, Percentage\r\n| render timechart",
+              "size": 0,
+              "aggregation": 2,
+              "color": "pink",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 1"
+          }
+        ]
+      },
+      "name": "Password_Evolution",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId\r\n| extend Date_AuthTime = make_datetime(AuthTime)\r\n| extend FormatedAuthTime = format_datetime(Date_AuthTime,\"MM-dd-yyyy hh:mm\")\r\n| where \"{ComputerName:escape}\" == \"*\" or displayName contains \"{ComputerName:escape}\" \r\n| where \"{UserName:escape}\" == \"*\" or UserPrincipalName contains \"{UserName:escape}\" \r\n| where Method == \"Password\"\r\n| order by FormatedAuthTime\r\n| project\r\n    Time=FormatedAuthTime,\r\n    Method,\r\n    UserName=UserDisplayName,\r\n    User=UserPrincipalName,\r\n    Device=displayName,IP=IPAddress",
+        "size": 0,
+        "title": "Users using password",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Display",
+        "comparison": "isEqualTo",
+        "value": "Last"
+      },
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| summarize arg_max(TimeGenerated,*) by deviceId\r\n| extend Date_AuthTime = make_datetime(AuthTime)\r\n| extend FormatedAuthTime = format_datetime(Date_AuthTime,\"MM-dd-yyyy hh:mm\")\r\n| where \"{ComputerName:escape}\" == \"*\" or displayName contains \"{ComputerName:escape}\" \r\n| where \"{UserName:escape}\" == \"*\" or UserPrincipalName contains \"{UserName:escape}\" \r\n| where Method == \"Windows Hello for Business\"\r\n| order by FormatedAuthTime\r\n| project\r\n    Time=FormatedAuthTime,\r\n    Method,\r\n    UserName=UserDisplayName,\r\n    User=UserPrincipalName,\r\n    Device=displayName,IP=IPAddress",
+        "size": 0,
+        "title": "Users using WHFB",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Display",
+        "comparison": "isEqualTo",
+        "value": "Last"
+      },
+      "name": "query - 2",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| extend Date_AuthTime = make_datetime(AuthTime)\r\n| extend FormatedAuthTime = format_datetime(Date_AuthTime,\"MM-dd-yyyy hh:mm\")\r\n| where \"{ComputerName:escape}\" == \"*\" or displayName contains \"{ComputerName:escape}\" \r\n| where \"{UserName:escape}\" == \"*\" or UserPrincipalName contains \"{UserName:escape}\" \r\n| where Method == \"Password\"\r\n| order by FormatedAuthTime\r\n| project\r\n    Time=FormatedAuthTime,\r\n    Method,\r\n    UserName=UserDisplayName,\r\n    User=UserPrincipalName,\r\n    Device=displayName,IP=IPAddress",
+        "size": 0,
+        "title": "Users using password",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Display",
+        "comparison": "isEqualTo",
+        "value": "All"
+      },
+      "name": "query - 4",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "workspace(\"{WorkspaceName:label}\").SigninLogs \r\n| where AppDisplayName contains \"Windows Sign In\"\r\n| where ResultSignature == \"SUCCESS\"\r\n| extend Method = tostring(parse_json(AuthenticationDetails)[0].authenticationMethod)\r\n| extend AuthTime = tostring(parse_json(AuthenticationDetails)[0].authenticationStepDateTime)\r\n| extend displayName = tostring(DeviceDetail.displayName)\r\n| extend trustType = tostring(DeviceDetail.trustType)\r\n| extend deviceId = tostring(DeviceDetail.deviceId)\r\n| extend OS = tostring(DeviceDetail.operatingSystem)\r\n| extend isManaged = tostring(DeviceDetail.isManaged)\r\n| extend isCompliant = tostring(DeviceDetail.isCompliant)\r\n| extend city = tostring(LocationDetails.city)\r\n| extend state = tostring(LocationDetails.state)\r\n| where isManaged == \"true\"\r\n| extend Date_AuthTime = make_datetime(AuthTime)\r\n| extend FormatedAuthTime = format_datetime(Date_AuthTime,\"MM-dd-yyyy hh:mm\")\r\n| where \"{ComputerName:escape}\" == \"*\" or displayName contains \"{ComputerName:escape}\" \r\n| where \"{UserName:escape}\" == \"*\" or UserPrincipalName contains \"{UserName:escape}\" \r\n| where Method == \"Windows Hello for Business\"\r\n| order by FormatedAuthTime\r\n| project\r\n    Time=FormatedAuthTime,\r\n    Method,\r\n    UserName=UserDisplayName,\r\n    User=UserPrincipalName,\r\n    Device=displayName,IP=IPAddress",
+        "size": 0,
+        "title": "Users using WHFB",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000,
+          "filter": true
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Display",
+        "comparison": "isEqualTo",
+        "value": "All"
+      },
+      "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
