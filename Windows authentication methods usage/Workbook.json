@@ -117,6 +117,21 @@
       "name": "parameters - 3"
     },
     {
+      "type": 1,
+      "content": {
+        "json": "Click on Edit then type the workspace name in the WorkspaceName parameter !!!",
+        "style": "warning"
+      },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isEqualTo"
+      },
+      "name": "text - 11",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
@@ -196,6 +211,10 @@
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
+      },
       "name": "global count"
     },
     {
@@ -256,6 +275,10 @@
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
+      },
       "name": "group - 7"
     },
     {
@@ -300,6 +323,10 @@
             }
           }
         ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
       },
       "name": "group - 8"
     },
@@ -356,6 +383,10 @@
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
+      },
       "name": "WHFB evolution",
       "styleSettings": {
         "showBorder": true
@@ -411,6 +442,10 @@
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "WorkspaceName",
+        "comparison": "isNotEqualTo"
+      },
       "name": "Password_Evolution",
       "styleSettings": {
         "showBorder": true
@@ -432,11 +467,17 @@
           "filter": true
         }
       },
-      "conditionalVisibility": {
-        "parameterName": "Display",
-        "comparison": "isEqualTo",
-        "value": "Last"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "Display",
+          "comparison": "isEqualTo",
+          "value": "Last"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
       "name": "query - 1",
       "styleSettings": {
         "showBorder": true
@@ -458,11 +499,17 @@
           "filter": true
         }
       },
-      "conditionalVisibility": {
-        "parameterName": "Display",
-        "comparison": "isEqualTo",
-        "value": "Last"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "Display",
+          "comparison": "isEqualTo",
+          "value": "Last"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
       "name": "query - 2",
       "styleSettings": {
         "showBorder": true
@@ -484,11 +531,17 @@
           "filter": true
         }
       },
-      "conditionalVisibility": {
-        "parameterName": "Display",
-        "comparison": "isEqualTo",
-        "value": "All"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "Display",
+          "comparison": "isEqualTo",
+          "value": "All"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
       "name": "query - 4",
       "styleSettings": {
         "showBorder": true
@@ -510,11 +563,17 @@
           "filter": true
         }
       },
-      "conditionalVisibility": {
-        "parameterName": "Display",
-        "comparison": "isEqualTo",
-        "value": "All"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "Display",
+          "comparison": "isEqualTo",
+          "value": "All"
+        },
+        {
+          "parameterName": "WorkspaceName",
+          "comparison": "isNotEqualTo"
+        }
+      ],
       "name": "query - 5",
       "styleSettings": {
         "showBorder": true
