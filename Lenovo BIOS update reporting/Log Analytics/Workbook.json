@@ -30,6 +30,14 @@
             "linkLabel": "BIOS update details",
             "subTarget": "Details",
             "style": "link"
+          },
+          {
+            "id": "ec4de6e5-6bf2-45d4-980c-a76acf4049e6",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Devices to update",
+            "subTarget": "ToUpdate",
+            "style": "link"
           }
         ]
       },
@@ -67,18 +75,37 @@
             ]
           },
           {
-            "id": "9d291fb2-a186-47e3-95c3-9d551e027118",
+            "id": "d95656c8-c9d9-4904-af8f-e121ab1528b0",
             "version": "KqlParameterItem/1.0",
             "name": "LastBIOSReleaseDelay",
             "label": "Where last BIOS release is",
             "type": 2,
-            "description": "Filter on BIOS release date. Choosing a low delay may increase numbers. because many devices may have not installed the new update.",
+            "isRequired": true,
             "typeSettings": {
               "additionalResourceOptions": [],
               "showDefault": false
             },
-            "jsonData": "[\r\n    { \"value\":\"1\", \"label\":\"> 1 day\" },\r\n    { \"value\":\"7\", \"label\":\"> 7 days\"},\r\n    { \"value\":\"10\", \"label\":\"> 10 days\" },\r\n    { \"value\":\"20\", \"label\":\"> 20 days\", \"selected\":true  },\r\n    { \"value\":\"30\", \"label\":\"> 30 days\" },\r\n    { \"value\":\"40\", \"label\":\"> 40 days\" },\r\n    { \"value\":\"50\", \"label\":\"> 50 days\" },\r\n    { \"value\":\"60\", \"label\":\"> 60 days\" },\r\n    { \"value\":\"70\", \"label\":\"> 70 days\" },\r\n    { \"value\":\"80\", \"label\":\"> 80 days\" },\r\n    { \"value\":\"90\", \"label\":\"> 90 days\" },\r\n    { \"value\":\"100\", \"label\":\"> 100 days\"},\r\n    { \"value\":\"120\", \"label\":\"> 100 days\"},\r\n    { \"value\":\"120\", \"label\":\"> 150 days\"}\r\n]",
-            "value": "1"
+            "jsonData": "[\r\n    { \"value\":\"1\", \"label\":\"> 1 day\" },\r\n    { \"value\":\"7\", \"label\":\"> 7 days\"},\r\n    { \"value\":\"10\", \"label\":\"> 10 days\" },\r\n    { \"value\":\"20\", \"label\":\"> 20 days\", \"selected\":true  },\r\n    { \"value\":\"30\", \"label\":\"> 30 days\" },\r\n    { \"value\":\"40\", \"label\":\"> 40 days\" },\r\n    { \"value\":\"50\", \"label\":\"> 50 days\" },\r\n    { \"value\":\"60\", \"label\":\"> 60 days\" },\r\n    { \"value\":\"70\", \"label\":\"> 70 days\" },\r\n    { \"value\":\"80\", \"label\":\"> 80 days\" },\r\n    { \"value\":\"90\", \"label\":\"> 90 days\" },\r\n    { \"value\":\"100\", \"label\":\"> 100 days\"},\r\n    { \"value\":\"120\", \"label\":\"> 100 days\"},\r\n    { \"value\":\"120\", \"label\":\"> 150 days\"}\r\n]"
+          },
+          {
+            "id": "29628e44-9d00-40e3-9d59-38703d908eaf",
+            "version": "KqlParameterItem/1.0",
+            "name": "Severity",
+            "label": "Filter on severity",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"Recommended\", \"label\":\"Recommended\" },\r\n    { \"value\":\"Critical\", \"label\":\"Critical\", \"selected\":true}\r\n]",
+            "value": [
+              "Critical",
+              "Recommended"
+            ]
           }
         ],
         "style": "pills",
@@ -102,7 +129,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "LenovoBIOS_CL\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where NewBIOSDaysOld > {LastBIOSReleaseDelay}\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize LenovoBIOS_CL = count() by IsUptoDate , ModelFamilyname\r\n\r\n\r\n",
+              "query": "LenovoBIOS_CL\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where NewBIOSDaysOld > {LastBIOSReleaseDelay}\r\n| where isnotempty(NewerBIOSCount)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where isnotempty(NewerBIOSCount)\r\n| summarize LenovoBIOS_CL = count() by IsUptoDate , ModelFamilyname",
               "size": 4,
               "title": "BIOS update status",
               "timeContext": {
@@ -126,7 +153,7 @@
                 ]
               }
             },
-            "customWidth": "40",
+            "customWidth": "30",
             "conditionalVisibility": {
               "parameterName": "SelectedTab",
               "comparison": "isEqualTo",
@@ -134,7 +161,7 @@
             },
             "name": "query - 2",
             "styleSettings": {
-              "maxWidth": "50",
+              "maxWidth": "30",
               "showBorder": true
             }
           },
@@ -142,52 +169,56 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where isnotempty(LastBIOSSeverity)\r\n| where IsUptoDate == \"No\"\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where NewBIOSDaysOld > {LastBIOSReleaseDelay}\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| summarize LenovoBIOS_CL = count() by LastBIOSSeverityLabel//,ModelFamilyname\r\n\r\n\r\n\r\n",
+              "query": "LenovoBIOS_CL\r\n| where isnotempty(NewerBIOSCount)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| extend UpdateState = case(\r\nIsUptoDate == \"Yes\", \"Uptodate\", \r\nIsUptoDate == \"No\" and NewerBIOSCount <= 1, \"Uptodate\", \r\nIsUptoDate == \"No\" and NewerBIOSCount > 1, \"Not uptodate\", \r\n\"Unnown\")\r\n| summarize LenovoBIOS_CL = count() by UpdateState",
               "size": 4,
-              "title": "Devices with BIOS not uptodate by severity",
+              "title": "Update status including BIOS with at most 1 version outdated",
               "timeContext": {
                 "durationMs": 2592000000
               },
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
-              "visualization": "piechart",
-              "chartSettings": {
-                "seriesLabelSettings": [
+              "visualization": "table",
+              "gridSettings": {
+                "labelSettings": [
                   {
-                    "seriesName": "Critical",
-                    "color": "redBright"
+                    "columnId": "UpdateState",
+                    "label": "Status"
                   },
                   {
-                    "seriesName": "Recommended",
-                    "color": "orange"
+                    "columnId": "LenovoBIOS_CL",
+                    "label": "Count"
                   }
                 ]
+              },
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "UpdateState",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "LenovoBIOS_CL",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
               }
             },
-            "customWidth": "40",
-            "conditionalVisibility": {
-              "parameterName": "SelectedTab",
-              "comparison": "isEqualTo",
-              "value": "Resume"
-            },
-            "name": "query - 16",
+            "customWidth": "30",
+            "name": "query - 2",
             "styleSettings": {
-              "margin": "20",
-              "padding": "40",
-              "maxWidth": "50",
+              "maxWidth": "30",
               "showBorder": true
             }
-          }
-        ]
-      },
-      "name": "group - 27"
-    },
-    {
-      "type": 12,
-      "content": {
-        "version": "NotebookGroup/1.0",
-        "groupType": "editable",
-        "items": [
+          },
           {
             "type": 3,
             "content": {
@@ -201,13 +232,105 @@
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces"
             },
-            "customWidth": "40",
+            "customWidth": "30",
             "conditionalVisibility": {
               "parameterName": "SelectedTab",
               "comparison": "isEqualTo",
               "value": "Resume"
             },
             "name": "query - 26",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| where TimeGenerated >= startofmonth(datetime_add(\"month\",-12,now())) and TimeGenerated < startofmonth(now())\r\n| summarize arg_max(TimeGenerated, LastBIOSVersion, IsUptoDate) by Device, Month = startofmonth(TimeGenerated)\r\n| project Device, Month, LastBIOSVersion, IsUptoDate\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where IsUptoDate == \"Yes\"\r\n| summarize Count = count() by Month\r\n| order by Month asc\r\n| render timechart ",
+              "size": 0,
+              "title": "Evolution of up-to-date devices over the past year chart",
+              "color": "lightBlue",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "showMetrics": false
+              }
+            },
+            "customWidth": "70",
+            "name": "query - 3",
+            "styleSettings": {
+              "maxWidth": "70",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| where TimeGenerated >= startofmonth(datetime_add(\"month\",-12,now()))\r\n  and TimeGenerated < startofmonth(now())\r\n| summarize arg_max(TimeGenerated, LastBIOSVersion, IsUptoDate) by Device, Month = startofmonth(TimeGenerated)\r\n| project Device, Month, LastBIOSVersion, IsUptoDate\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where IsUptoDate == \"Yes\"\r\n| extend Month =  format_datetime(Month,\"MM-yyyy\")\r\n| summarize Count = count() by Month\r\n| order by Month asc\r\n",
+              "size": 0,
+              "title": "Evolution of up-to-date devices over the past year",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "sortBy": [
+                  {
+                    "itemKey": "Month",
+                    "sortOrder": 1
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "Month",
+                  "sortOrder": 1
+                }
+              ]
+            },
+            "customWidth": "30",
+            "name": "query - 4",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "group - 26"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Today = now();\r\nlet InventoryStats = LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where isnotempty(NewerBIOSCount);\r\nunion\r\n(\r\n    InventoryStats\r\n    | where NewerBIOSCount <= 2\r\n    | summarize Count = count()\r\n    | project Category = \"< 2 versions\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where NewerBIOSCount > 2 and NewerBIOSCount < 5\r\n    | summarize Count = count()\r\n    | project Category = \"Between 2 and 5 versions\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where NewerBIOSCount > 5 and NewerBIOSCount < 10\r\n    | summarize Count = count()\r\n    | project Category = \"Between 5 and 10 versions\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where NewerBIOSCount >= 10\r\n    | summarize Count = count()\r\n    | project Category = \"> 10 versions\", Count\r\n)\r\n| render piechart \r\n",
+              "size": 4,
+              "title": "BIOS not uptodate by count of newer versions (since current installed)",
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 30",
             "styleSettings": {
               "maxWidth": "50",
               "showBorder": true
@@ -217,182 +340,103 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where LastBIOSVersion == \"Multiple versions available\"\r\n| count",
+              "query": "let Today = now();\r\nlet InventoryStats = DriversInventory_CL\r\n| where manufacturer_s contains \"Lenovo\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend TimeDiff = datetime_diff('day', Today, BIOSDateFormated_value_t);\r\nunion\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 60\r\n    | summarize Count = count()\r\n    | project Category = \"< 2 months\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 180\r\n    | summarize Count = count()\r\n    | project Category = \"< 6 months\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 365\r\n    | summarize Count = count()\r\n    | project Category = \"< 1 year\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff > 365 and TimeDiff < 730\r\n    | summarize Count = count()\r\n    | project Category = \"Between 1 and 2 years\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff >= 730\r\n    | summarize Count = count()\r\n    | project Category = \"> 2 years\", Count\r\n)\r\n| render piechart ",
               "size": 4,
-              "title": "Devices with no BIOS info found",
+              "title": "Devices with BIOS not uptodate since (in days)",
               "timeContext": {
                 "durationMs": 2592000000
               },
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
-              "visualization": "card",
-              "textSettings": {
-                "style": "bignumber"
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "> 2 years",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "< 2 months",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "Between 1 and 2 years",
+                    "color": "orange"
+                  },
+                  {
+                    "seriesName": "< 6 months",
+                    "color": "turquoise"
+                  }
+                ]
               }
             },
-            "customWidth": "40",
-            "conditionalVisibility": {
-              "parameterName": "SelectedTab",
-              "comparison": "isEqualTo",
-              "value": "Resume"
-            },
-            "name": "query - 15",
+            "customWidth": "50",
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "Resume"
+              },
+              {
+                "parameterName": "DriversInventory_CL",
+                "comparison": "isNotEqualTo",
+                "value": "\"\""
+              }
+            ],
+            "name": "query - 24",
             "styleSettings": {
               "maxWidth": "50",
               "showBorder": true
             }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where NewBIOSDaysOld > {LastBIOSReleaseDelay}\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where IsUptoDate contains \"No\"\r\n| where isnotempty(NewerBIOSCount)\r\n| summarize LenovoBIOS_CL = count() by ModelFamilyname\r\n",
+              "size": 1,
+              "title": "Devices with BIOS not uptodate (per model and count of versions)",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ModelFamilyname",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "LenovoBIOS_CL",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "name": "query - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
           }
         ]
-      },
-      "name": "group - 26"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "let Today = now();\r\nlet InventoryStats = DriversInventory_CL\r\n| where manufacturer_s contains \"Lenovo\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend TimeDiff = datetime_diff('day', Today, BIOSDateFormated_value_t);\r\nunion\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 60\r\n    | summarize Count = count()\r\n    | project Category = \"< 2 months\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 180\r\n    | summarize Count = count()\r\n    | project Category = \"< 6 months\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff <= 365\r\n    | summarize Count = count()\r\n    | project Category = \"< 1 year\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff > 365 and TimeDiff < 730\r\n    | summarize Count = count()\r\n    | project Category = \"Between 1 and 2 years\", Count\r\n),\r\n(\r\n    InventoryStats\r\n    | where TimeDiff >= 730\r\n    | summarize Count = count()\r\n    | project Category = \"> 2 years\", Count\r\n)\r\n| render piechart ",
-        "size": 4,
-        "title": "Devices with BIOS not uptodate since (in days)",
-        "timeContext": {
-          "durationMs": 2592000000
-        },
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "visualization": "piechart",
-        "chartSettings": {
-          "seriesLabelSettings": [
-            {
-              "seriesName": "> 2 years",
-              "color": "redBright"
-            },
-            {
-              "seriesName": "< 2 months",
-              "color": "green"
-            },
-            {
-              "seriesName": "Between 1 and 2 years",
-              "color": "orange"
-            },
-            {
-              "seriesName": "< 6 months",
-              "color": "turquoise"
-            }
-          ]
-        }
-      },
-      "conditionalVisibilities": [
-        {
-          "parameterName": "SelectedTab",
-          "comparison": "isEqualTo",
-          "value": "Resume"
-        },
-        {
-          "parameterName": "DriversInventory_CL",
-          "comparison": "isNotEqualTo",
-          "value": "\"\""
-        }
-      ],
-      "name": "query - 24",
-      "styleSettings": {
-        "showBorder": true
-      }
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where NewBIOSDaysOld > {LastBIOSReleaseDelay}\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| summarize LenovoBIOS_CL = count() by ModelFamilyname\r\n| order by LenovoBIOS_CL",
-        "size": 1,
-        "title": "Devices with BIOS not uptodate (per model)",
-        "timeContext": {
-          "durationMs": 2592000000
-        },
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "visualization": "tiles",
-        "tileSettings": {
-          "showBorder": false,
-          "titleContent": {
-            "columnMatch": "ModelFamilyname",
-            "formatter": 1
-          },
-          "leftContent": {
-            "columnMatch": "LenovoBIOS_CL",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "auto"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        }
       },
       "conditionalVisibility": {
         "parameterName": "SelectedTab",
         "comparison": "isEqualTo",
         "value": "Resume"
       },
-      "name": "query - 13",
-      "styleSettings": {
-        "showBorder": true
-      }
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "let Today = now();\r\nLenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| extend DeviceName_s=Device\r\n| join DriversInventory_CL on DeviceName_s\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend CurrentBIOSDaysOld = datetime_diff('day',Today,BIOSDateFormated_value_t)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n| where CurrentBIOSDaysOld > 100\r\n| summarize LenovoBIOS_CL = count() by ModelFamilyname\r\n| order by LenovoBIOS_CL\r\n",
-        "size": 1,
-        "title": "Devices with BIOS not uptodate > 100 days (per model)",
-        "timeContext": {
-          "durationMs": 2592000000
-        },
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "visualization": "tiles",
-        "tileSettings": {
-          "showBorder": false,
-          "titleContent": {
-            "columnMatch": "ModelFamilyname",
-            "formatter": 1
-          },
-          "leftContent": {
-            "columnMatch": "LenovoBIOS_CL",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "auto"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        }
-      },
-      "conditionalVisibilities": [
-        {
-          "parameterName": "SelectedTab",
-          "comparison": "isEqualTo",
-          "value": "Resume"
-        },
-        {
-          "parameterName": "DriversInventory_CL",
-          "comparison": "isNotEqualTo",
-          "value": "\"\""
-        }
-      ],
-      "name": "query - 24",
-      "styleSettings": {
-        "showBorder": true
-      }
+      "name": "notuptodate group"
     },
     {
       "type": 9,
@@ -543,9 +587,9 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where isnotempty(LastBIOSSeverity)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSDate > ago (30d)\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| summarize by ModelFamilyname,LastBIOSVersion,LastBIOSDateFormated,LastBIOSSeverity,LastBIOSSeverityLabel,ModelMTM\r\n| summarize arg_max(LastBIOSDateFormated,*) by ModelMTM\r\n| project Model=ModelFamilyname,MTM=ModelMTM,['BIOS version']=LastBIOSVersion,['Realease date']=LastBIOSDateFormated,['BIOS severity']=LastBIOSSeverityLabel",
+        "query": "LenovoBIOS_CL\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where isnotempty(LastBIOSSeverity)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where LastBIOSDate > ago (30d)\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| where LastBIOSVersion <> \"Can not get info\"\r\n| summarize by ModelFamilyname,LastBIOSVersion,LastBIOSDateFormated,LastBIOSSeverity,LastBIOSSeverityLabel,ModelMTM\r\n| summarize arg_max(LastBIOSDateFormated,*) by ModelMTM\r\n| project Model=ModelFamilyname,MTM=ModelMTM,['BIOS version']=LastBIOSVersion,['Realease date']=LastBIOSDateFormated,['BIOS severity']=LastBIOSSeverityLabel",
         "size": 1,
-        "title": "BIOS updates available in the past 30 days",
+        "title": "Last BIOS updates published on Lenovo website (in the past 30 days)",
         "timeContext": {
           "durationMs": 2592000000
         },
@@ -597,7 +641,175 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "LenovoBIOS_CL\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where isnotempty(LastBIOSSeverity)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| summarize by ModelFamilyname,LastBIOSVersion,LastBIOSDateFormated,LastBIOSSeverity,LastBIOSSeverityLabel,ModelMTM\r\n| summarize arg_max(LastBIOSDateFormated,*) by ModelMTM\r\n| project Model=ModelFamilyname,MTM=ModelMTM,['BIOS version']=LastBIOSVersion,['Realease date']=LastBIOSDateFormated,['BIOS severity']=LastBIOSSeverityLabel\r\n\r\n",
+        "query": "DriversInventory_Translate_CL\r\n| where isnotempty(WUName_s)\r\n| summarize arg_max(TimeGenerated,*) by ModelFriendlyName_s,WUName_s\r\n| where DeviceManufacturer_s contains \"lenovo\"\r\n| where DriverManufacturer_s contains \"lenovo\"\r\n| where DriverName_s contains \"System Firmware\"\r\n//| where DriverDate_t > ago (30d)\r\n| extend DriverDate_Format = format_datetime(DriverDate_t, 'yyyy-M-dd')\r\n| summarize arg_max(DriverDate_t,*) by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s,['Package name']=WUName_s,['Package date']=DriverDate_Format",
+        "size": 1,
+        "title": "BIOS updates available as windows update in the past 30 days",
+        "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "Package date",
+              "sortOrder": 2
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "Package date",
+            "sortOrder": 2
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "DriversInventory_Translate_CL",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        }
+      ],
+      "name": "query - 24",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "BIOS versions history (per model)",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "95a0b4f4-b1b1-4a69-8146-a8e52796c10e",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "ModelHistory",
+                  "label": "Select a model",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "query": "LenovoBIOS_CL\r\n| where ModelFamilyname <> \"\"\r\n| distinct ModelFamilyname",
+                  "typeSettings": {
+                    "limitSelectTo": 4,
+                    "additionalResourceOptions": [
+                      "value::1"
+                    ],
+                    "showDefault": false
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 0,
+                  "resourceType": "microsoft.operationalinsights/workspaces",
+                  "value": [
+                    "value::1"
+                  ]
+                },
+                {
+                  "id": "b2c7f0ad-aaeb-4b24-89b3-413b16071a38",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "DelayHistory",
+                  "type": 2,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"30\", \"label\":\"Last 30 days\", \"selected\":true},\r\n    { \"value\":\"60\", \"label\":\"Last 60 days\"},\r\n    { \"value\":\"90\", \"label\":\"Last 3 months\"},\r\n    { \"value\":\"180\", \"label\":\"Last 6 months\"},\r\n    { \"value\":\"365\", \"label\":\"Last year\"},\r\n    { \"value\":\"730\", \"label\":\"Last 2 years\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": "365",
+                  "label": "Delay history"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where LastBIOSVersion <> \"Can not get info\"\r\n| where isnotempty(LastBIOSSeverity)\r\n| where ModelFamilyname has_any ({ModelHistory})\r\n| order by LastBIOSDate\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| where TimeGenerated > ago({DelayHistory}d)\r\n| summarize by ModelFamilyname,LastBIOSVersion,LastBIOSDateFormated,LastBIOSSeverity,LastBIOSSeverityLabel,ModelMTM\r\n| project Model=ModelFamilyname,MTM=ModelMTM,['BIOS version']=LastBIOSVersion,['Realease date']=LastBIOSDateFormated,['BIOS severity']=LastBIOSSeverityLabel",
+              "size": 1,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "sortBy": [
+                  {
+                    "itemKey": "Realease date",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "Realease date",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "name": "query - 1",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "group - 28",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "OptionalUpdates_CL\r\n| where DriverClass_s contains \"Firmware\"\r\n| where Title_s contains \"Lenovo Ltd. - Firmware\"\r\n| where isnotempty(Title_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| extend DriverDate_Format = format_datetime(DriverChangeTime_t, 'yyyy-M-dd')\r\n| where DriverChangeTime_t > ago (30d)\r\n| summarize arg_max(DriverChangeTime_t,*) by ModelFriendlyName_s\r\n| order by DriverChangeTime_t\r\n| project Model=ModelFriendlyName_s,['Package name']=Title_s,['Package date']=DriverDate_Format\r\n",
+        "size": 1,
+        "title": "BIOS updates available as optional windows update in the past 30 days",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "query - 26",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "LenovoBIOS_CL\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where LastBIOSVersion <> \"Can not get info\"\r\n| where isnotempty(LastBIOSSeverity)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| extend LastBIOSDateFormated = format_datetime(LastBIOSDate, 'yyyy-M-dd')\r\n| summarize by ModelFamilyname,LastBIOSVersion,LastBIOSDateFormated,LastBIOSSeverity,LastBIOSSeverityLabel,ModelMTM\r\n| summarize arg_max(LastBIOSDateFormated,*) by ModelMTM\r\n| project Model=ModelFamilyname,MTM=ModelMTM,['BIOS version']=LastBIOSVersion,['Realease date']=LastBIOSDateFormated,['BIOS severity']=LastBIOSSeverityLabel\r\n\r\n",
         "size": 1,
         "title": "Last BIOS version by model",
         "timeContext": {
@@ -1059,6 +1271,29 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
+        "query": "LenovoBIOS_CL\r\n| top 50 by NewerBIOSCount\r\n| project Device,User,NewerBIOSCount,ModelFamilyname,ModelMTM,SN\r\n| order by NewerBIOSCount",
+        "size": 0,
+        "title": "Top 50 devices with old BIOS depending of newer versions count",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 32",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
         "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where ModelFamilyname has_any ({ComputerModel})\r\n| where IsUptoDate == \"Yes\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| where ModelMTM has_any ({ComputerMTM})\r\n| where \"{ComputerName:escape}\" == \"*\" or Device contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device, User, MTM=ModelMTM, Model=ModelFamilyname,['BIOS version']=CurrentBIOSVersion\r\n\r\n\r\n\r\n",
         "size": 1,
         "title": "Devices with BIOS uptodate",
@@ -1172,40 +1407,28 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "DriversInventory_Translate_CL\r\n| where isnotempty(WUName_s)\r\n| summarize arg_max(TimeGenerated,*) by ModelFriendlyName_s,WUName_s\r\n| where DeviceManufacturer_s contains \"lenovo\"\r\n| where DriverManufacturer_s contains \"lenovo\"\r\n| where DriverName_s contains \"System Firmware\"\r\n| extend DriverDate_Format = format_datetime(DriverDate_t, 'yyyy-M-dd')\r\n| summarize arg_max(DriverDate_t,*) by ModelFriendlyName_s\r\n| project Model=ModelFriendlyName_s,['Package name']=WUName_s,['Package date']=DriverDate_Format",
+        "query": "OptionalUpdates_CL\r\n| where DriverClass_s contains \"Firmware\"\r\n| where Title_s contains \"Lenovo Ltd. - Firmware\"\r\n| where isnotempty(Title_s)\r\n| where isnotempty(ModelFriendlyName_s)\r\n| extend DriverDate_Format = format_datetime(DriverChangeTime_t, 'yyyy-M-dd')\r\n| summarize arg_max(DriverChangeTime_t,*) by ModelFriendlyName_s\r\n| order by DriverChangeTime_t\r\n| project Model=ModelFriendlyName_s,['Package name']=Title_s,['Package date']=DriverDate_Format",
         "size": 1,
-        "title": "Last Windows Update package by version and model",
-        "timeContextFromParameter": "TimeRange",
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "gridSettings": {
-          "sortBy": [
-            {
-              "itemKey": "Model",
-              "sortOrder": 2
-            }
-          ]
+        "title": "Last BIOS update available in optional updates by version and model",
+        "timeContext": {
+          "durationMs": 86400000
         },
-        "sortBy": [
-          {
-            "itemKey": "Model",
-            "sortOrder": 2
-          }
-        ]
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
       },
       "conditionalVisibilities": [
+        {
+          "parameterName": "OptionalUpdates_CL",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        },
         {
           "parameterName": "SelectedTab",
           "comparison": "isEqualTo",
           "value": "Resume"
-        },
-        {
-          "parameterName": "DriversInventory_Translate_CL",
-          "comparison": "isNotEqualTo",
-          "value": "\"\""
         }
       ],
-      "name": "query - 24",
+      "name": "query - 25",
       "styleSettings": {
         "showBorder": true
       }
@@ -1224,14 +1447,14 @@
           "rowLimit": 10000,
           "sortBy": [
             {
-              "itemKey": "Devices count",
+              "itemKey": "WUName_s",
               "sortOrder": 2
             }
           ]
         },
         "sortBy": [
           {
-            "itemKey": "Devices count",
+            "itemKey": "WUName_s",
             "sortOrder": 2
           }
         ]
@@ -1312,6 +1535,350 @@
         }
       ],
       "name": "query - 5",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "9162aaef-bde0-41db-93dc-3974b5ca91d3",
+            "version": "KqlParameterItem/1.0",
+            "name": "DevicesToUpdateModel",
+            "label": "Filter on model",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "LenovoBIOS_CL\r\n| where ModelFamilyname <> \"\"\r\n| distinct ModelFamilyname",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 604800000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "ThinkPad T14s",
+              "ThinkPad P1 Gen 6",
+              "ThinkPad P1 Gen 7",
+              "ThinkPad P1 Gen 1",
+              "ThinkPad P1 Gen 8",
+              "ThinkPad T14s Gen 5"
+            ]
+          },
+          {
+            "id": "3ce8480a-3d68-4af9-bceb-3318a06f91ef",
+            "version": "KqlParameterItem/1.0",
+            "name": "DelayOrVersion",
+            "label": "Choose a way to filter",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"Delay\", \"label\":\"BIOS older than x days\",\"selected\":true},\r\n    { \"value\":\"Versions\", \"label\":\"Newer versions since the current\",\"selected\":true}\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "ToUpdate"
+      },
+      "name": "parameters - 30"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices to update depending of the age of the current BIOS",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "fc4dd701-dd42-43b4-bb67-894fc0ce4ce1",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "DevicesToUpdateDelay",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"180\", \"label\":\"6 months\" },\r\n    { \"value\":\"300\", \"label\":\"1 year \", \"selected\":true  },\r\n    { \"value\":\"730\", \"label\":\"2 years\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "label": "BIOS older than"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Today = now();\r\nLenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| extend DeviceName_s=Device\r\n| join DriversInventory_CL on DeviceName_s\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend CurrentBIOSDaysOld = datetime_diff('day',Today,BIOSDateFormated_value_t)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n| where CurrentBIOSDaysOld > {DevicesToUpdateDelay}\r\n| where isnotempty(CurrentBIOSDaysOld)\r\n| where isnotempty(CurrentBIOSVersion)\r\n| where isnotempty(LastBIOSVersion)\r\n| summarize Total = count()\r\n| extend Result = strcat(Total, \" devices with BIOS older than {DevicesToUpdateDelay:label}\")\r\n| project Result",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "name": "query - 3"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Today = now();\r\nLenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| extend DeviceName_s=Device\r\n| join DriversInventory_CL on DeviceName_s\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend CurrentBIOSDaysOld = datetime_diff('day',Today,BIOSDateFormated_value_t)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n| where CurrentBIOSDaysOld > {DevicesToUpdateDelay}\r\n| where isnotempty(CurrentBIOSDaysOld)\r\n| where isnotempty(CurrentBIOSVersion)\r\n| where isnotempty(LastBIOSVersion)\r\n| where ModelFamilyname has_any ({DevicesToUpdateModel})\r\n| summarize Models_Count = count() by ModelFamilyname\r\n| order by Models_Count\r\n//| count",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ModelFamilyname",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Models_Count",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "ToUpdate"
+            },
+            "name": "query - 31",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let Today = now();\r\nLenovoBIOS_CL\r\n| where IsUptoDate == \"No\"\r\n| where LastBIOSVersion <> \"Multiple versions available\"\r\n| extend DeviceName_s=Device\r\n| join DriversInventory_CL on DeviceName_s\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(BIOSVersion_s)\r\n| extend CurrentBIOSDaysOld = datetime_diff('day',Today,BIOSDateFormated_value_t)\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| order by CurrentBIOSDaysOld desc\r\n//| where CurrentBIOSDaysOld > 300\r\n| where CurrentBIOSDaysOld > {DevicesToUpdateDelay}\r\n| where isnotempty(CurrentBIOSDaysOld)\r\n| where isnotempty(CurrentBIOSVersion)\r\n| where isnotempty(LastBIOSVersion)\r\n| where ModelFamilyname has_any ({DevicesToUpdateModel})\r\n| project Device,User,Model=ModelFamilyname,['Current BIOS version']=CurrentBIOSVersion,['New BIOS version']=LastBIOSVersion,['Count i days']=CurrentBIOSDaysOld,['Serial number']=SN\r\n",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "ToUpdate"
+              },
+              {
+                "parameterName": "DriversInventory_CL",
+                "comparison": "isNotEqualTo",
+                "value": "\"\""
+              }
+            ],
+            "name": "query - 29",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "ToUpdate"
+      },
+      "name": "group - 31",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices to update depending of the count of newer versions available since the current one ",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "9e47e7f5-d721-4f2e-8615-ba7b654fd483",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "NewerVersionsCount",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"2\", \"label\":\"2\"},\r\n    { \"value\":\"5\", \"label\":\"5\", \"selected\":true},\r\n    { \"value\":\"7\", \"label\":\"7\"},\r\n    { \"value\":\"10\", \"label\":\"10\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "label": "New versions available"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where IsUptoDate == \"No\"\r\n| where isnotempty(NewerBIOSCount)\r\n| where LastBIOSVersion <> \"Multiple versions available\" \r\n| where NewerBIOSCount > {NewerVersionsCount}\r\n| summarize Total = count()\r\n| extend Result = strcat(Total, \" devices with more than {NewerVersionsCount} older versions since the current\")\r\n| project Result",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "name": "query - 3"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where IsUptoDate == \"No\"\r\n| where isnotempty(NewerBIOSCount)\r\n| where LastBIOSVersion <> \"Multiple versions available\" \r\n| where NewerBIOSCount > {NewerVersionsCount}\r\n| where ModelFamilyname has_any ({DevicesToUpdateModel})\r\n| summarize Models_Count = count() by ModelFamilyname\r\n| order by Models_Count",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ModelFamilyname",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Models_Count",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "ToUpdate"
+            },
+            "name": "query - 32",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "LenovoBIOS_CL\r\n| summarize arg_max(TimeGenerated,*) by Device\r\n| where IsUptoDate == \"No\"\r\n| where isnotempty(NewerBIOSCount)\r\n| where LastBIOSVersion <> \"Multiple versions available\" \r\n| where NewerBIOSCount > {NewerVersionsCount}\r\n| project Device,CurrentBIOSVersion,LastBIOSVersion,NewerBIOSCount,ModelFamilyname,ModelMTM,SN,User\r\n",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "ToUpdate"
+            },
+            "name": "query - 31",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "ToUpdate"
+      },
+      "name": "group - 33",
       "styleSettings": {
         "showBorder": true
       }
