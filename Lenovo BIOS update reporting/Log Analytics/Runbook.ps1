@@ -1,9 +1,3 @@
-# Info about DCE, DCR, Table
-$DcrImmutableId = "dcr-" # id available in DCR > JSON view > immutableId
-$DceURI = "" # available in DCE > Logs Ingestion value
-$Table = "LenovoBIOS_CL" # custom log to create
-
-
 # Getting a token and authenticating to your tenant using the managed identity
 $url = $env:IDENTITY_ENDPOINT  
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]" 
@@ -15,6 +9,11 @@ Connect-AzAccount -Identity
 $headers = @{'Authorization'="Bearer " + $accessToken}
 
 $bearerToken = (Get-AzAccessToken -ResourceUrl "https://monitor.azure.com//.default").Token
+
+# Info about DCE, DCR, Table
+$DcrImmutableId = "dcr-" # id available in DCR > JSON view > immutableId
+$DceURI = "" # available in DCE > Logs Ingestion value
+$Table = "LenovoBIOS_CL" # custom log to create
 
 $Devices_URL = 'https://graph.microsoft.com/beta/deviceManagement/managedDevices?$filter' + "=contains(operatingSystem,'Windows')"
 $All_Devices = Invoke-WebRequest -Uri $Devices_URL -Method GET -Headers $Headers -UseBasicParsing 
@@ -28,14 +27,47 @@ If($All_Devices_JsonResponse.'@odata.nextLink')
         $All_Devices = Invoke-WebRequest -Uri $URL -Method GET -Headers $Headers -UseBasicParsing 
         $All_Devices_JsonResponse = ($All_Devices.Content | ConvertFrom-Json)
         $Get_All_Devices += $All_Devices_JsonResponse.value
+		# [System.GC]::GetTotalMemory($true) | out-null
     } until ($null -eq $All_Devices_JsonResponse.'@odata.nextLink')
 }
+
+#$Get_All_Devices = $Get_All_Devices | select -first 250
 
 $Devices_Array = @()
 $Getting_XML_Info = $False
 $Getting_BIOS_Location = $False 
 $Getting_BIOS_Version = $False
 
+# Part to count BIOS versions between the current one and last one available on Lenovo website
+Function Compare_BIOS_Versions
+	{
+		param(
+		$ReadMeUrl,	
+		$Current_BIOS_Version
+		)
+		
+		$Current_BIOS_Version = [version]$Current_BIOS_Version
+
+		$response = Invoke-WebRequest -Uri $ReadMeUrl -UseBasicParsing
+		$cleanText = ($response.Content -replace '<[^>]+>', '') -replace '&nbsp;', ' '
+		$pattern = 'UEFI:\s*([\d\.]+)\s*/'
+		$matches = [regex]::Matches($cleanText, $pattern)
+
+		$uefiVersions = @()
+		foreach ($match in $matches) {
+			$uefi = $match.Groups[1].Value
+			try {
+				$uefiVersions += [version]$uefi
+			} catch {
+				Write-Warning "Version UEFI invalide ignorée : $uefi"
+			}
+		}
+
+		$uefiVersions = $uefiVersions | Sort-Object -Descending | Select-Object -Unique
+		$BIOS_Versions_Count = ($uefiVersions | Where-Object { $_ -gt $Current_BIOS_Version }).Count
+
+		Return $BIOS_Versions_Count
+	}
 
 $URL = "https://download.lenovo.com/bsco/public/allModels.json"
 $Get_Models = Invoke-RestMethod -Uri $URL -Method GET
@@ -95,47 +127,81 @@ ForEach($Device in $Lenovo_Devices)
 
                 # Get current BIOS date
                 $node = $catalog.ModelList.Model | Where-Object { $_.Types.Type -eq "$Get_MTM" }
-                $ReadMeUrl = $node.BIOS.'#text'.Replace('.exe','.txt')
-                $content = (Invoke-WebRequest -Uri $ReadMeUrl -UseBasicParsing).Content
-                If($content -ne $null)
-                    {
-                        $Get_CurrentID_Line = ((($content -split "`n").trim() | select-string -pattern "$Current_BIOS_ID")[0]).tostring()
-                        If(($Get_CurrentID_Line -like "*/*/*"))
-                            {
-                                $Get_Current_BIOS_Date = ($Get_CurrentID_Line.split(" "))[-1]                
-                                If($Get_Current_BIOS_Date -ne $null)
-                                    {
-                                        $Format_BIOS_release_date = [DateTime]$Get_Current_BIOS_Date
-                                        $Diff_CurrentBIOS_and_Today = $Get_Current_Date - $Format_BIOS_release_date
-                                        $Diff_Today_CurrentBIOS = $Diff_CurrentBIOS_and_Today.Days
-                                        If($Diff_Today_CurrentBIOS -ne $null)
-                                            {
-                                                If($Diff_Today_CurrentBIOS -ge 1 -and $Diff_Today_CurrentBIOS -lt 180)
-                                                    {
-                                                        $Current_BIOS_Days_Old_Range = "1_180"
-                                                    }	
-                                                ElseIf($Diff_Today_CurrentBIOS -ge 180 -and $Diff_Today_CurrentBIOS -lt 365)
-                                                    {
-                                                        $Current_BIOS_Days_Old_Range = "180_365"
-                                                    }
-                                                ElseIf($Diff_Today_CurrentBIOS -ge 365 -and $Diff_Today_CurrentBIOS -lt 730)
-                                                    {
-                                                        $Current_BIOS_Days_Old_Range = "365_730"
-                                                    }
-                                                ElseIf($Diff_Today_CurrentBIOS -ge 730)
-                                                    {
-                                                        $Current_BIOS_Days_Old_Range = "730_More"
-                                                    }
-                                            }                                        
-                                    }	                               
-                            }
-                        Else
-                            {
-                                $Format_BIOS_release_date = $null
-                                $Diff_Today_CurrentBIOS = $null
-                                $Get_Current_BIOS_Date = $null
-                            }                            
-                    }                              
+                # $ReadMeUrl = $node.BIOS.'#text'.Replace('.exe','.txt')
+                $ReadMeUrl = $node.BIOS.'#text'.Replace('.exe','.html')
+				[int]$Newer_BIOS_Count = Compare_BIOS_Versions -ReadMeUrl $ReadMeUrl -Current_BIOS_Version $Current_BIOS_Version	
+				[string]$Newer_BIOS_Count2 = Compare_BIOS_Versions -ReadMeUrl $ReadMeUrl -Current_BIOS_Version $Current_BIOS_Version	
+				
+				# Try
+				# {
+					# $Check_ReadMe = (Invoke-WebRequest -Uri $ReadMeUrl -UseBasicParsing)
+				# } 
+				# Catch
+				# { 
+					# $Check_ReadMe = ""
+					# $Format_BIOS_release_date = $null
+					# $Diff_Today_CurrentBIOS = $null
+					# $Get_Current_BIOS_Date = $null					
+				# }
+					
+				# If($Check_ReadMe -ne "")
+				# {
+					# $content = (Invoke-WebRequest -Uri $ReadMeUrl -UseBasicParsing).Content
+					# If($content -ne $null)
+						# {
+							# $Get_CurrentID_Line = ((($content -split "`n").trim() | select-string -pattern "$Current_BIOS_ID")[0]).tostring()
+							# If($Get_CurrentID_Line -ne "")
+								# {
+									# If(($Get_CurrentID_Line -like "*/*/*"))
+										# {
+											# $Get_Current_BIOS_Date = ($Get_CurrentID_Line.split(" "))[-1]                
+											# If($Get_Current_BIOS_Date -ne $null)
+												# {
+													# $Format_BIOS_release_date = [DateTime]$Get_Current_BIOS_Date
+													# $Diff_CurrentBIOS_and_Today = $Get_Current_Date - $Format_BIOS_release_date
+													# $Diff_Today_CurrentBIOS = $Diff_CurrentBIOS_and_Today.Days
+													# If($Diff_Today_CurrentBIOS -ne $null)
+														# {
+															# If($Diff_Today_CurrentBIOS -ge 1 -and $Diff_Today_CurrentBIOS -lt 180)
+																# {
+																	# $Current_BIOS_Days_Old_Range = "1_180"
+																# }	
+															# ElseIf($Diff_Today_CurrentBIOS -ge 180 -and $Diff_Today_CurrentBIOS -lt 365)
+																# {
+																	# $Current_BIOS_Days_Old_Range = "180_365"
+																# }
+															# ElseIf($Diff_Today_CurrentBIOS -ge 365 -and $Diff_Today_CurrentBIOS -lt 730)
+																# {
+																	# $Current_BIOS_Days_Old_Range = "365_730"
+																# }
+															# ElseIf($Diff_Today_CurrentBIOS -ge 730)
+																# {
+																	# $Current_BIOS_Days_Old_Range = "730_More"
+																# }
+														# }                                        
+												# }	                               
+										# }
+									# Else
+										# {
+											# $Format_BIOS_release_date = $null
+											# $Diff_Today_CurrentBIOS = $null
+											# $Get_Current_BIOS_Date = $null
+										# } 								
+								# }
+							# Else
+								# {
+									# $Format_BIOS_release_date = $null
+									# $Diff_Today_CurrentBIOS = $null
+									# $Get_Current_BIOS_Date = $null						
+								# }								
+						# }
+					# Else
+						# {
+							# $Format_BIOS_release_date = $null
+							# $Diff_Today_CurrentBIOS = $null
+							# $Get_Current_BIOS_Date = $null						
+						# }
+				# }                
             }
 
         $WindowsVersion2 = "win10"       
@@ -213,21 +279,19 @@ ForEach($Device in $Lenovo_Devices)
                 $Get_Current_Date = get-date
                 $Last_BIOS_Date = $PackageXml.Package.ReleaseDate 
 				$Last_BIOS_Severity = $PackageXml.Package.severity.type
-				#f($Last_BIOS_Severity -ne $null)
-				#	{
-						If($Last_BIOS_Severity -eq "1")
-							{
-								$Last_BIOS_Severity_Label = "Critical"
-							}
-						ElseIf($Last_BIOS_Severity -eq "2")
-							{
-								$Last_BIOS_Severity_Label = "Recommended"
-							}
-						Else
-							{
-								$Last_BIOS_Severity_Label = "Unknown"
-							}							
-				#	}                
+				If($Last_BIOS_Severity -eq "1")
+					{
+						$Last_BIOS_Severity_Label = "Critical"
+					}
+				ElseIf($Last_BIOS_Severity -eq "2")
+					{
+						$Last_BIOS_Severity_Label = "Recommended"
+					}
+				Else
+					{
+						$Last_BIOS_Severity_Label = "Unknown"
+					}		
+					
                 If($Last_BIOS_Date -ne $null)
                     {
                         Try{
@@ -281,10 +345,14 @@ ForEach($Device in $Lenovo_Devices)
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSDateFormat" -Value $Get_Converted_BIOS_Date	
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "IsUptoDate" -Value $BIOS_Status
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "NewBIOSDaysOld" -Value $Diff_in_days	 
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "NewerBIOSCount" -Value $Newer_BIOS_Count	
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "NewerBIOSCounter" -Value $Newer_BIOS_Count2				
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "CurrentBIOSDaysOldRange" -Value $Current_BIOS_Days_Old_Range
         Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSSeverity" -Value $Last_BIOS_Severity	
-        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSSeverityLabel" -Value $Last_BIOS_Severity_Label	        	 
+        Add-Member -InputObject $Obj -MemberType NoteProperty -Name "LastBIOSSeverityLabel" -Value $Last_BIOS_Severity_Label	 
+
         $Devices_Array += $Obj
+		[System.GC]::GetTotalMemory($true) | out-null
     }
 
 $BIOS_Update_Status = $Devices_Array | where {($_.IsUptoDate -ne "Can not get info")}
@@ -295,5 +363,6 @@ ForEach($Device in $BIOS_Update_Status)
         # Sending data to Log Analytics Custom Log
         $headers = @{"Authorization" = "Bearer $bearerToken"; "Content-Type" = "application/json" };
         $uri = "$DceURI/dataCollectionRules/$DcrImmutableId/streams/Custom-$Table"+"?api-version=2023-01-01";
-        $uploadResponse = Invoke-RestMethod -Uri $uri -Method "Post" -Body $body -Headers $headers;           
+        $uploadResponse = Invoke-RestMethod -Uri $uri -Method "Post" -Body $body -Headers $headers;      
+		# [System.GC]::GetTotalMemory($true) | out-null		
     }
