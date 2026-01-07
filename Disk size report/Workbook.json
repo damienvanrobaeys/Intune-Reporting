@@ -1,0 +1,2106 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "d81462fa-14fb-42fd-812c-10f83a63f0d5",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Resume",
+            "subTarget": "Resume",
+            "style": "link"
+          },
+          {
+            "id": "da8f0c23-99a4-483b-b18a-958ef3c050de",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Low disk space devices",
+            "subTarget": "LowDiskSpace",
+            "style": "link"
+          },
+          {
+            "id": "0eab2dfd-9e64-44f9-a319-ea5e39d0663c",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Remediate issue on a device",
+            "subTarget": "Remediate",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 7"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "2163b959-5b54-4ae3-abfd-544df5346a3a",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "label": "Type a device name",
+            "value": ""
+          },
+          {
+            "id": "47a7d5c4-1bdb-4b69-8a4d-0efc1f243cca",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerModel",
+            "label": "Filter by model",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "IntuneDevices\r\n| where OS contains \"Windows\"\r\n| where Model !contains \"Surface Hub\" and Model !contains \"VMware\"\r\n| distinct Model",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 2592000000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "id": "6f4ac3d8-e958-4ea7-81a1-00714ace955b",
+            "version": "KqlParameterItem/1.0",
+            "name": "FreeDiskSizeLimit",
+            "type": 2,
+            "isRequired": true,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"1\", \"label\":\"1%\" },\r\n    { \"value\":\"5\", \"label\":\"5%\" },\r\n    { \"value\":\"10\", \"label\":\"10%\" },\r\n    { \"value\":\"20\", \"label\":\"20%\", \"selected\":true},\r\n    { \"value\":\"30\", \"label\":\"30%\" },\r\n    { \"value\":\"40\", \"label\":\"40%\" },\r\n    { \"value\":\"50\", \"label\":\"50%\" }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "label": "Free space < than",
+            "value": "10"
+          },
+          {
+            "id": "7582ef13-968b-4842-8d2d-270b85b12554",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": {
+              "durationMs": 2592000000
+            }
+          },
+          {
+            "id": "5bd0e88b-59ee-44af-b086-fba4bd18cc45",
+            "version": "KqlParameterItem/1.0",
+            "name": "ShowOneDrivePart",
+            "type": 2,
+            "isRequired": true,
+            "isHiddenWhenLocked": true,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"True\", \"label\":\"True\", \"selected\":true},\r\n    { \"value\":\"False\", \"label\":\"False\" }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "d19fcc8d-7c96-4d54-b150-cceaf8906945",
+            "version": "KqlParameterItem/1.0",
+            "name": "ShowPSTPart",
+            "type": 2,
+            "isRequired": true,
+            "isHiddenWhenLocked": true,
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    { \"value\":\"True\", \"label\":\"True\", \"selected\":true},\r\n    { \"value\":\"False\", \"label\":\"False\" }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 4"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "IntuneDevices\r\n| summarize arg_max(TimeGenerated, *) by DeviceName\r\n| where Model !contains \"Surface Hub\" and Model !contains \"VMware\"\r\n| where OS contains \"Windows\"\r\n| where isnotnull(StorageFree)\r\n| extend FreePercent = round(toreal(StorageFree) / toreal(StorageTotal) * 100) \r\n| where isnotempty(FreePercent)\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| extend DateFormat = format_datetime(DeviceLastContact, \"MM-dd-yyyy\")\r\n| where DeviceLastContact > ago(7d)\r\n| where Model has_any ({ComputerModel})\r\n| extend DiskState = case(\r\nFreePercent < 5, \"Less 5%\", \r\nFreePercent >= 5 and FreePercent < 20, \"Between 5% and 20%\", \r\nFreePercent >= 20 and FreePercent <= 50, \"Between 20% and 50%\", \r\nFreePercent >= 50, \"Above 50 %\", \r\n\"Unnown\")\r\n| summarize DiskState_Count = count() by DiskState \r\n//| project DeviceName,FreePercent,DiskState\r\n",
+        "size": 4,
+        "title": "Free space on disk in %",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "DeviceName",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "FreePercent",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Above 50 %",
+              "color": "green"
+            },
+            {
+              "seriesName": "Between 20% and 50%",
+              "color": "blue"
+            },
+            {
+              "seriesName": "Between 5% and 20%",
+              "color": "orange"
+            },
+            {
+              "seriesName": "Less 5%",
+              "color": "redBright"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "50",
+      "name": "query - 1",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "IntuneDevices\r\n| summarize arg_max(TimeGenerated, *) by DeviceName\r\n| where Model !contains \"Surface Hub\" and Model !contains \"VMware\"\r\n| where OS contains \"Windows\"\r\n| where isnotnull(StorageFree)\r\n| extend FreePercent = round(toreal(StorageFree) / toreal(StorageTotal) * 100) \r\n| where isnotempty(FreePercent)\r\n| where FreePercent < {FreeDiskSizeLimit}\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| where DeviceLastContact > ago(7d)\r\n//| extend DeviceType = iff(ManagedBy == \"Intune\",\"NEXT 2\", \"NEXT 1\")\r\n| summarize DeviceType_Count = count() by ManagedBy \r\n\r\n\r\n",
+        "size": 4,
+        "title": "Devices with low disk space (< {FreeDiskSizeLimit}% of free disk space)",
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "NEXT 1",
+              "color": "blue"
+            },
+            {
+              "seriesName": "NEXT 2",
+              "color": "yellow"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "customWidth": "50",
+      "name": "query - 9",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| extend UserSizetoClean = todouble(coalesce(RecycleBinSize_d, 0.0)) + todouble(coalesce(DesktopSizeOnDiskMb_d, 0.0))  \r\n                           + todouble(coalesce(DocumentsSizeOnDiskMb_d, 0.0)) + todouble(coalesce(PicturesSizeOnDiskMb_d, 0.0))\r\n                           + todouble(coalesce(DownloadSize_d, 0.0)) + todouble(coalesce(UserTempSize_d, 0.0)) + todouble(coalesce(PSTTotalSize_d, 0.0)) \r\n| extend SystemSizeToClean = todouble(coalesce(WindowsTempSize_d, 0.0)) + todouble(coalesce(ccmcacheSize_d, 0.0))   \r\n                           + todouble(coalesce(WinsxsSize_d, 0.0)) + todouble(coalesce(ProgramDataSize_d, 0.0))\r\n                           + todouble(coalesce(MemoryDMPSize_d, 0.0)) + todouble(coalesce(minidumpSize_d, 0.0))\r\n                           + todouble(coalesce(KernelReportsSize_d, 0.0)) + todouble(coalesce(CrashdumpsSize_d, 0.0))  \r\n                           + todouble(coalesce(SoftwareDistributionSize_d, 0.0)) + todouble(coalesce(WindowsOldSize_d, 0.0)) \r\n                           + todouble(coalesce(WindowsLogsSize_d, 0.0)) \r\n| summarize 5Gb=countif(UserSizetoClean > 5368709120 or SystemSizeToClean > 5368709120),\r\n10Gb=countif(UserSizetoClean > 10737418240 or SystemSizeToClean > 10737418240),\r\n15Gb=countif(UserSizetoClean > 16106127360 or SystemSizeToClean > 16106127360),\r\n20Gb=countif(UserSizetoClean > 21474836480 or SystemSizeToClean > 21474836480),\r\n30Gb=countif(UserSizetoClean > 32212254720 or SystemSizeToClean > 32212254720),\r\n40Gb=countif(UserSizetoClean > 42949672960 or SystemSizeToClean > 42949672960),\r\n50Gb=countif(UserSizetoClean > 53687091200 or SystemSizeToClean > 53687091200)\r\n",
+              "size": 4,
+              "title": "Disk space available for cleanup on devices with free disk space < {FreeDiskSizeLimit}% (by device count)",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "5Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "devices",
+                          "text": ""
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1} "
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "10Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "devices",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "15Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ],
+                      "compositeBarSettings": {
+                        "labelText": "",
+                        "columnSettings": []
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "20Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "info",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "30Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "info",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "40Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "info",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "50Gb",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "info",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 8",
+            "styleSettings": {
+              "maxWidth": "50",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL \r\n| where isnotempty(DeviceModel_s)\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| summarize DiskSize_CL = count() by DeviceModel_s\r\n| project-rename ['Model']=DeviceModel_s, Count=DiskSize_CL\r\n| top 10 by Count desc nulls last",
+              "size": 4,
+              "title": "Top 10 models with low disk space (< {FreeDiskSizeLimit}%)",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 0",
+            "styleSettings": {
+              "maxWidth": "50",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "IntuneDevices\r\n| summarize arg_max(TimeGenerated, *) by DeviceName\r\n| where Model !contains \"Surface Hub\" and Model !contains \"VMware\"\r\n| where OS contains \"Windows\"\r\n| where isnotnull(StorageFree)\r\n| extend FreePercent = round(toreal(StorageFree) / toreal(StorageTotal) * 100) \r\n| where isnotempty(FreePercent)\r\n| where FreePercent < {FreeDiskSizeLimit}\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| extend DateFormat = format_datetime(DeviceLastContact, \"MM-dd-yyyy\")\r\n| where Model has_any ({ComputerModel})\r\n| where DeviceLastContact > ago(7d)\r\n//| summarize Model_Count = count() by Model\r\n//| order by Model_Count\r\n//| where ManagedBy contains \"intune\"\r\n| extend DeviceModel = iff(Manufacturer == \"LENOVO\", substring(Model, 0, 4), Model)\r\n| project DeviceName,Model,DeviceModel,Manufacturer\r\n| summarize Model_Count = count() by DeviceModel\r\n| order by Model_Count",
+              "size": 1,
+              "title": "Devices (by models) with low disk space (< {FreeDiskSizeLimit}% of free disk space)",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "DeviceModel",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Model_Count",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 4",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| summarize\r\n    5Gb  = countif(DownloadSize_d > 5368709120),\r\n    10Gb = countif(DownloadSize_d > 10737418240),\r\n    15Gb = countif(DownloadSize_d > 16106127360),\r\n    20Gb = countif(DownloadSize_d > 21474836480),\r\n    30Gb = countif(DownloadSize_d > 32212254720),\r\n    40Gb = countif(DownloadSize_d > 42949672960),\r\n    50Gb = countif(DownloadSize_d > 53687091200)\r\n| extend categories = pack_array(\r\n    pack(\"Category\",\"> 5Gb\",\"Value\",5Gb),\r\n    pack(\"Category\",\"> 15Gb\",\"Value\",15Gb),\r\n    pack(\"Category\",\"> 30Gb\",\"Value\",30Gb),\r\n    pack(\"Category\",\"> 50Gb\",\"Value\",50Gb)\r\n)\r\n| mv-expand categories\r\n| project Category = tostring(categories.Category), Value = toint(categories.Value)\r\n| render piechart",
+              "size": 4,
+              "title": "Downloads folder usage",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 11",
+            "styleSettings": {
+              "maxWidth": "50",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| summarize\r\n    5Gb  = countif(RecycleBinSize_d > 5368709120),\r\n    15Gb = countif(RecycleBinSize_d > 16106127360),\r\n    30Gb = countif(RecycleBinSize_d > 32212254720),\r\n    50Gb = countif(RecycleBinSize_d > 53687091200)\r\n| extend categories = pack_array(\r\n    pack(\"Category\",\"> 5Gb\",\"Value\",5Gb),\r\n    pack(\"Category\",\"> 15Gb\",\"Value\",15Gb),\r\n    pack(\"Category\",\"> 30Gb\",\"Value\",30Gb),\r\n    pack(\"Category\",\"> 50Gb\",\"Value\",50Gb)\r\n)\r\n| mv-expand categories\r\n| project Category = tostring(categories.Category), Value = toint(categories.Value)\r\n| render piechart",
+              "size": 4,
+              "title": "Recycle bin usage",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 12",
+            "styleSettings": {
+              "maxWidth": "50",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Resume"
+      },
+      "name": "infos 1"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(DesktopPath_s)\r\n| where isnotempty(DocumentsPath_s)\r\n| where isnotempty(PicturesPath_s)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State0 = case(\r\n    DesktopPath_s contains \"onedrive\" and DocumentsPath_s contains \"onedrive\" and PicturesPath_s contains \"onedrive\", \"On OneDrive\",\r\n    DesktopPath_s !contains \"onedrive\" and DocumentsPath_s !contains \"onedrive\" and PicturesPath_s !contains \"onedrive\", \"Local\",\r\n    \"Mixed\"\r\n)\r\n| extend State = case(\r\n    DesktopPath_s contains \"onedrive\" and DocumentsPath_s contains \"onedrive\", \"On OneDrive\",\r\n    DesktopPath_s !contains \"onedrive\" and DocumentsPath_s !contains \"onedrive\", \"Local\",\r\n    \"Mixed\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"On OneDrive\", \"Local\")\r\n| render piechart",
+              "size": 4,
+              "title": "OneDrive or Local ?",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Local",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "On OneDrive",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 13",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| summarize DiskSize_CL = count() by AlwaysKeepDevice_s",
+              "size": 4,
+              "title": "Devices with \"Always keep on device\" checked at OneDrive root",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "No",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "Yes",
+                    "color": "redBright"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "Resume"
+              },
+              {
+                "parameterName": "AlwaysKeepDevice_s",
+                "comparison": "isNotEqualTo",
+                "value": "\"\""
+              }
+            ],
+            "name": "query - 10",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(DesktopPath_s)\r\n| where isnotempty(DocumentsPath_s)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State = case(\r\n    DesktopPath_s contains \"onedrive\" and DocumentsPath_s contains \"onedrive\", \"On OneDrive\",\r\n    DesktopPath_s !contains \"onedrive\" and DocumentsPath_s !contains \"onedrive\", \"Local\",\r\n    \"Mixed\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"On OneDrive\", \"Local\")\r\n| render piechart",
+              "size": 4,
+              "title": "OneDrive usage where free disk space < {FreeDiskSizeLimit}% (by device count)",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Local",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "On OneDrive",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 7",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(DesktopPath_s)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State = case(\r\n    DesktopPath_s contains \"onedrive\", \"On OneDrive\",\r\n    DesktopPath_s !contains \"onedrive\", \"Local\",\r\n    \"Unknown\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"On OneDrive\", \"Local\")\r\n| render piechart",
+              "size": 4,
+              "title": "Desktop folder location",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Local",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "On OneDrive",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 16",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(DocumentsPath_s)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State = case(\r\n    DocumentsPath_s contains \"onedrive\", \"On OneDrive\",\r\n    DocumentsPath_s !contains \"onedrive\", \"Local\",\r\n    \"Unknown\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"On OneDrive\", \"Local\")\r\n| render piechart",
+              "size": 4,
+              "title": "Documents folder location",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Local",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "On OneDrive",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 1",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(PicturesPath_s)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State = case(\r\n    PicturesPath_s contains \"onedrive\", \"On OneDrive\",\r\n    PicturesPath_s !contains \"onedrive\", \"Local\",\r\n    \"Unknown\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"On OneDrive\", \"Local\")\r\n| render piechart",
+              "size": 4,
+              "title": "Pictures folder location",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Local",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "On OneDrive",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 2",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where AlwaysKeepDevice_s contains \"Yes\"\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| project Computer=DeviceName_s, Model=DeviceModel_s, ['Free space %']=HardDiskFreeSpacePercent_d,['Disk freespace']=DiskFreeSpaceMb_d\r\n",
+              "size": 1,
+              "title": "Devices with \"Always keep on device\" enabled",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Disk freespace",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "filter": true
+              }
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "Resume"
+              },
+              {
+                "parameterName": "AlwaysKeepDevice_s",
+                "comparison": "isNotEqualTo",
+                "value": "\"\""
+              }
+            ],
+            "name": "query - 11",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(DesktopPath_s)\r\n| where isnotempty(DocumentsPath_s)\r\n| where isnotempty(PicturesPath_s)\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n//| where DesktopPath_s !contains \"onedrive\" and DocumentsPath_s !contains \"onedrive\" and PicturesPath_s !contains \"onedrive\"\r\n| where DesktopPath_s !contains \"onedrive\" and DocumentsPath_s !contains \"onedrive\"\r\n| project Device=DeviceName_s,Model=DeviceModel_s,User=UserName_s,['Free disk space %']=HardDiskFreeSpacePercent_d,['Free disk space']=DiskFreeSpaceMb_d",
+              "size": 0,
+              "title": "Devices that are not using OneDrive for Desktop and Documents",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Free disk space %",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": ">=",
+                          "thresholdValue": "15",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "<=",
+                          "thresholdValue": "15",
+                          "representation": "redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "lightBlue",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "Free disk space",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Resume"
+            },
+            "name": "query - 14",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "ShowOneDrivePart",
+          "comparison": "isEqualTo",
+          "value": "True"
+        }
+      ],
+      "name": "onedrive part"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(PSTTotalSize_d)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| extend State = case(\r\n    PSTTotalSize_d > 2147483648, \"With large PST\",\r\n    PSTTotalSize_d < 2147483648, \"Without large PST\",\r\n    \"Unknown\"\r\n)\r\n| summarize Count = count() by State\r\n| where State in (\"With large PST\", \"Without large PST\")\r\n| render piechart",
+              "size": 4,
+              "title": "Devices with large PST and low disk space (< {FreeDiskSizeLimit}% of free disk space)",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "With large PST",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "Without large PST",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "name": "query - 0",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Resume"
+        },
+        {
+          "parameterName": "ShowPSTPart",
+          "comparison": "isEqualTo",
+          "value": "True"
+        }
+      ],
+      "name": "PST part"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "1fd96ee2-8e2f-4087-b6bc-e0cf0d0b0336",
+            "cellValue": "SelectedTab2",
+            "linkTarget": "parameter",
+            "linkLabel": "Global",
+            "subTarget": "Global",
+            "style": "link"
+          },
+          {
+            "id": "6049cab6-1026-446c-add7-dbb6a518d12b",
+            "cellValue": "SelectedTab2",
+            "linkTarget": "parameter",
+            "linkLabel": "From the system side",
+            "subTarget": "SystemSide",
+            "preText": "From the user side",
+            "style": "link"
+          },
+          {
+            "id": "407a447e-3d51-45c0-9a39-434e48d3368f",
+            "cellValue": "SelectedTab2",
+            "linkTarget": "parameter",
+            "linkLabel": "From the user side",
+            "subTarget": "UserSide",
+            "preText": "From the system side",
+            "style": "link"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "LowDiskSpace"
+      },
+      "name": "links - 16"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices with content that can be purged on devices with low disk space (< than 10%)",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "f394bc88-4f98-475a-947b-0a5a37636782",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "ContentSizeToClean",
+                  "label": "Content to clean",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"5368709120\", \"label\":\"> than 5Gb\"},\r\n    { \"value\":\"10737418240\", \"label\":\"> than 10Gb\", \"selected\":true },\r\n    { \"value\":\"16106127360\", \"label\":\"> than 15Gb\" },\r\n    { \"value\":\"21474836480\", \"label\":\"> than 20Gb\"},\r\n    { \"value\":\"32212254720\", \"label\":\"> than 30Gb\" },\r\n    { \"value\":\"42949672960\", \"label\":\"> than 40Gb\" },\r\n    { \"value\":\"53687091200\", \"label\":\"> than 50Gb\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "This part shows content taking > {ContentSizeToClean:label} on the device and that can be partially purged to free up disk space.\r\n<br><br>\r\nThe \"Size to clean\" contains the following content:\r\n- C:\\ProgramData size\r\n- C:\\Windows\\TempSize size\r\n- C:\\Windows\\minidump\r\n- C:\\Windows\\LiveKernelReports\r\n- C:\\Windows\\memory.dmp\r\n- Userprofile\\AppData\\Local\\CrashDumps\r\n- C:\\WinsxsSize\r\n- C:\\Windows.old\r\n- C:\\Windows\\ccmcache\r\n- C:\\Windows\\SoftwareDistribution\\Download\r\n- C:\\windows\\Logs\r\n- Downloads folder size\r\n- user temp folder\r\n- OneDrive size on disk\r\n- Documents size on disk\r\n- Desktop size on disk\r\n- Recycle bin size\r\n",
+              "style": "upsell"
+            },
+            "name": "text - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| extend DeviceName = DeviceName_s\r\n| join IntuneDevices on $left.DeviceName_s == $right.DeviceName\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| where Model !contains \"Surface Hub\" and Model !contains \"VMware\"\r\n| where OS contains \"Windows\"\r\n| extend DeviceType = iff(ManagedBy == \"Intune\",\"Next2\", \"Next1\")\r\n| extend UserSizetoClean = todouble(coalesce(RecycleBinSize_d, 0.0)) + todouble(coalesce(DesktopSizeOnDiskMb_d, 0.0))  \r\n                           + todouble(coalesce(DocumentsSizeOnDiskMb_d, 0.0)) + todouble(coalesce(PicturesSizeOnDiskMb_d, 0.0))\r\n                           + todouble(coalesce(DownloadSize_d, 0.0)) + todouble(coalesce(UserTempSize_d, 0.0)) + todouble(coalesce(PSTTotalSize_d, 0.0)) \r\n| extend SystemSizeToClean = todouble(coalesce(WindowsTempSize_d, 0.0)) + todouble(coalesce(ccmcacheSize_d, 0.0))   \r\n                           + todouble(coalesce(WinsxsSize_d, 0.0)) + todouble(coalesce(WindowsLogsSize_d, 0.0)) \r\n                           + todouble(coalesce(MemoryDMPSize_d, 0.0)) + todouble(coalesce(minidumpSize_d, 0.0))\r\n                           + todouble(coalesce(KernelReportsSize_d, 0.0)) + todouble(coalesce(CrashdumpsSize_d, 0.0))  \r\n                           + todouble(coalesce(SoftwareDistributionSize_d, 0.0)) + todouble(coalesce(WindowsOldSize_d, 0.0))                 \r\n| extend TotalSizeToClean = UserSizetoClean + SystemSizeToClean \r\n| where TotalSizeToClean >= {ContentSizeToClean}       \r\n| order by TotalSizeToClean\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Free disk space %']=HardDiskFreeSpacePercent_d,['Free disk space']=DiskFreeSpaceFormated_s,['Size to clean']=TotalSizeToClean,['User content to purge']=UserSizetoClean,['System content to clean']=SystemSizeToClean,['Disk full size']=DiskFullSizeFormated_s,User=UserName,Mail=UserEmail,Model=DeviceModel_s,Type=DeviceType,['Is \"Always keep on device\" enabled']=AlwaysKeepDevice_s,['OneDrive size on disk']=OneDriveSizeOnDiskFormated_s,['Desktop size on disk']=DesktopSizeOnDiskFormated_s,['Desktop path']=DesktopPath_s,['Documents size on disk']=DocumentsSizeOnDiskFormated_s,['Documents path']=DocumentsPath_s,['Pictures size on disk']=PicturesSizeOnDiskFormated_s,['Pictures path']=PicturesPath_s,['Downloads size']=DownloadSizeFormated_s,['User temp']=UserTempSizeFormated_s,['Recycle bin size']=RecycleBinSizeFormated_s,['PST count']=PSTCount_d,['PST total size']=PSTTotalSizeFormated_s,['PST files']=PSTFiles_s,['ProgramData size']=ProgramDataSizeFormated_s,['Windows Temp size']=WindowsTempSizeFormated_s,['Kernel reports size']=KernelReportsSizeFormated_s,['Memory DMP size']=MemoryDMPSizeFormated_s,['Minidump size']=MinidumpSizeFormated_s,['Crashdumps size']=CrashdumpsSizeFormated_s,['Winsxs size']=WinsxsSizeFormated_s,['SoftwareDistribution size']=SoftwareDistribSizeFormated_s,['Windows.Old size']=WindowsOldSizeFormated_s,['Windows Logs size']=WindowsLogs_SizeFormated_s,['CCMCache size']=ccmcacheSizeFormated_s,['Larger folders in C>Users']=TopUsersFolder_s,['Larger folders at C: root']=Top10CFolder_s,['Larger folders in ProgramData']=Top10ProgramDataFolder_s",
+              "size": 0,
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Size to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "User content to purge",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "System content to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Total size that can be potentially purged",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal"
+                      }
+                    }
+                  }
+                ],
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "LowDiskSpace"
+            },
+            "name": "query - 13",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "LowDiskSpace"
+        },
+        {
+          "parameterName": "SelectedTab2",
+          "comparison": "isEqualTo",
+          "value": "Global"
+        }
+      ],
+      "name": "global content to clean",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "See user content that can be purged on devices with free disk space < {FreeDiskSizeLimit}% ",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "9fba47a2-d414-4ac2-a5ad-52eb3d3394d5",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "UserSize",
+                  "label": "User content > than",
+                  "type": 2,
+                  "isRequired": true,
+                  "isGlobal": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"1073741824\", \"label\":\"1Gb\", \"selected\":true},\r\n    { \"value\":\"5368709120\", \"label\":\"5Gb\", \"selected\":true},\r\n    { \"value\":\"10737418240\", \"label\":\"10Gb\" },\r\n    { \"value\":\"16106127360\", \"label\":\"15Gb\" },\r\n    { \"value\":\"21474836480\", \"label\":\"20Gb\"},\r\n    { \"value\":\"32212254720\", \"label\":\"30Gb\" },\r\n    { \"value\":\"42949672960\", \"label\":\"40Gb\" },\r\n    { \"value\":\"53687091200\", \"label\":\"50Gb\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "This part shows user content taking > {UserSize:label} on the device and that can be partially purged to free up disk space.\r\n<br><br>\r\nThe \"Size to clean\" contains the following content:\r\n- Downloads folder size\r\n- user temp folder\r\n- OneDrive size on disk\r\n- Documents size on disk\r\n- Desktop size on disk\r\n- Recyclke bin size\r\n",
+              "style": "upsell"
+            },
+            "name": "text - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n//| where DeviceModel_s has_any ({ComputerModel}) \r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n//| extend UserSizetoClean = RecycleBinSize_d + DesktopSizeOnDiskMb_d + DocumentsSizeOnDiskMb_d + PicturesSizeOnDiskMb_d + DownloadSize_d + UserTempSize_d //+ PSTTotalSize_d\r\n| extend UserSizetoClean = todouble(coalesce(RecycleBinSize_d, 0.0)) + todouble(coalesce(DesktopSizeOnDiskMb_d, 0.0))  \r\n                           + todouble(coalesce(DocumentsSizeOnDiskMb_d, 0.0)) + todouble(coalesce(PicturesSizeOnDiskMb_d, 0.0))\r\n                           + todouble(coalesce(DownloadSize_d, 0.0)) + todouble(coalesce(UserTempSize_d, 0.0)) + todouble(coalesce(PSTTotalSize_d, 0.0)) \r\n| where UserSizetoClean > {UserSize}\r\n| order by UserSizetoClean\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Model=DeviceModel_s, ['Free space %']=HardDiskFreeSpacePercent_d,['Disk freespace']=DiskFreeSpaceMb_d,['Full size']=DiskFullSizeMb_d,['Size to clean']=UserSizetoClean",
+              "size": 0,
+              "title": "User content that takes up the most space and can be purged",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Disk freespace",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Full size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Size to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_number_Size to clean_5",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_number_Size to clean_5",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "name": "query - 1",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n//| where DeviceModel_s has_any ({ComputerModel}) \r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| where RecycleBinSize_d > 5368709120 or OneDriveSizeOnDiskMb_d > 5368709120 \r\nor DesktopSizeOnDiskMb_d > 5368709120 or DocumentsSizeOnDiskMb_d > 5368709120 or PicturesSizeOnDiskMb_d > 5368709120 \r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Model=DeviceModel_s, ['Free space %']=HardDiskFreeSpacePercent_d,['Disk freespace']=DiskFreeSpaceMb_d,['Full size']=DiskFullSizeMb_d,['Recycle bin size']=RecycleBinSize_d,Downloads=DownloadSize_d,['OneDrive on disk']=OneDriveSizeOnDiskMb_d,['Desktop size on disk']=DesktopSizeOnDiskMb_d,['Desktop path']=DesktopPath_s,['Documents size on disk']=DocumentsSizeOnDiskMb_d,['Documents path']=DocumentsPath_s,['Pictures size on disk']=PicturesSizeOnDiskMb_d,['Pictures path']=PicturesPath_s,['User temp']=UserTempSize_d,['PST size']=PSTTotalSize_d,['Always keep on device ?']=AlwaysKeepDevice_s",
+              "size": 0,
+              "title": "Details about content that take space",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Disk freespace",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumSignificantDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Full size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Recycle bin size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Downloads",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "OneDrive on disk",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Desktop size on disk",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Documents size on disk",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Pictures size on disk",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "User temp",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "PST size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Disk size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "filter": true,
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_number_PST size_15",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_number_PST size_15",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "LowDiskSpace"
+            },
+            "name": "query - 5",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n//| where DeviceName_s contains \"P64001782\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n//| where DeviceName_s contains \"DESKTOP-F6O36EO\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| where isnotempty(Top10ODFoldersArray_s)\r\n| project Top10ODFoldersArray_s\r\n| extend Parsed = parse_json(Top10ODFoldersArray_s)\r\n| mv-expand Parsed\r\n| extend \r\n    Path = tostring(Parsed.Path),\r\n    SizeOnDisk = tolong(Parsed.FullSize),\r\n    FormatedSize = tostring(Parsed.Size)\r\n| where isnotempty(SizeOnDisk)\r\n| top 10 by SizeOnDisk\r\n| project Path, ['Size on disk']=FormatedSize",
+              "size": 0,
+              "title": "Larger folders at OneDrive root ",
+              "timeContext": {
+                "durationMs": 14400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Size on disk",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              "sortBy": []
+            },
+            "conditionalVisibility": {
+              "parameterName": "DeviceName_s",
+              "comparison": "isNotEqualTo",
+              "value": "\"\""
+            },
+            "name": "query - 6",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where isnotempty(PSTCount_d)\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| where  PSTCount_d > 0\r\n| order by PSTTotalSize_d\r\n| project Device=DeviceName_s,User=UserName_s,Model=DeviceModel_s,['PST count']=PSTCount_d,['Total size of PST']=PSTTotalSize_d,['PST files']=PSTFiles_s,['Free disk %']=HardDiskFreeSpacePercent_d,['Free disk size']=DiskFreeSpaceMb_d\r\n",
+              "size": 0,
+              "title": "Devices with PST and < {FreeDiskSizeLimit}% of free disk space",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Total size of PST",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "PST files",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Free disk size",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "PSTTotalSize_d",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "DiskFreeSpaceMb_d",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_number_Total size of PST_4",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_number_Total size of PST_4",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "LowDiskSpace"
+              },
+              {
+                "parameterName": "ShowPSTPart",
+                "comparison": "isEqualTo",
+                "value": "True"
+              }
+            ],
+            "name": "query - 15",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(TopUsersFoldersText_s)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Folders=TopUsersFoldersText_s\r\n",
+              "size": 0,
+              "title": "Larger folders in C:\\Users for devices with < than {FreeDiskSizeLimit}% free space",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "name": "query - 4",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ],
+        "exportParameters": true
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "LowDiskSpace"
+        },
+        {
+          "parameterName": "SelectedTab2",
+          "comparison": "isEqualTo",
+          "value": "UserSide"
+        }
+      ],
+      "name": "user content",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "See system content that can be purged on devices with free disk space < {FreeDiskSizeLimit}% ",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "3fea2b36-dc77-4f14-92a6-476ed68f037c",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "SystemSize",
+                  "label": "System content > than",
+                  "type": 2,
+                  "isRequired": true,
+                  "isGlobal": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"5368709120\", \"label\":\"5Gb\", \"selected\":true},\r\n    { \"value\":\"10737418240\", \"label\":\"10Gb\" },\r\n    { \"value\":\"16106127360\", \"label\":\"15Gb\" },\r\n    { \"value\":\"21474836480\", \"label\":\"20Gb\"},\r\n    { \"value\":\"32212254720\", \"label\":\"30Gb\" },\r\n    { \"value\":\"42949672960\", \"label\":\"40Gb\" },\r\n    { \"value\":\"53687091200\", \"label\":\"50Gb\" }\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "This part shows system content taking > {SystemSize:label} on the device and that can be partially purged to free up disk space.\r\n<br><br>\r\nThe \"Size to clean\" contains the following content:\r\n- C:\\ProgramData size\r\n- C:\\Windows\\TempSize size\r\n- C:\\Windows\\minidump \r\n- C:\\Windows\\LiveKernelReports\r\n- C:\\Windows\\memory.dmp\r\n- Userprofile\\AppData\\Local\\CrashDumps\r\n- C:\\WinsxsSize\r\n- C:\\Windows.old\r\n- C:\\Windows\\ccmcache\r\n- C:\\Windows\\SoftwareDistribution\\Download\r\n- C:\\windows\\Logs",
+              "style": "upsell"
+            },
+            "name": "text - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n//| where DeviceModel_s has_any ({ComputerModel}) \r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| extend SystemSizeToClean = todouble(coalesce(WindowsTempSize_d, 0.0)) + todouble(coalesce(WindowsOldSize_d, 0.0))  \r\n                           + todouble(coalesce(WinsxsSize_d, 0.0)) + todouble(coalesce(ProgramDataSize_d, 0.0))\r\n                           + todouble(coalesce(MemoryDMPSize_d, 0.0)) + todouble(coalesce(minidumpSize_d, 0.0))\r\n                           + todouble(coalesce(KernelReportsSize_d, 0.0)) + todouble(coalesce(CrashdumpsSize_d, 0.0))  \r\n                           + todouble(coalesce(SoftwareDistributionSize_d, 0.0)) + todouble(coalesce(WindowsOldSize_d, 0.0)) \r\n                           + todouble(coalesce(WindowsLogsSize_d, 0.0))  + todouble(coalesce(ccmcacheSize_d, 0.0)) \r\n| where SystemSizeToClean > {SystemSize}\r\n| order by SystemSizeToClean\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Model=DeviceModel_s, ['Free space %']=HardDiskFreeSpacePercent_d,['Disk freespace']=DiskFreeSpaceMb_d,['Size to clean']=SystemSizeToClean",
+              "size": 0,
+              "title": "System content that takes up the most space and can be purged",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Disk freespace",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Size to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "rowLimit": 10000,
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_number_Size to clean_4",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_number_Size to clean_4",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "name": "query - 1",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n//| where DeviceModel_s has_any ({ComputerModel}) \r\n| where isnotempty(DeviceName_s)\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| where ProgramDataSize_d > 5368709120 or WindowsTempSize_d > 5368709120 or KernelReportsSize_d > 5368709120 \r\nor MemoryDMPSize_d > 5368709120 or minidumpSize_d > 5368709120 \r\nor CrashdumpsSize_d > 5368709120 or WinsxsSize_d > 5368709120 \r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Model=DeviceModel_s, ['Free space %']=HardDiskFreeSpacePercent_d,['Disk freespace']=DiskFreeSpaceMb_d,['ProgramData']=ProgramDataSize_d,['Windows temp']=WindowsTempSize_d,['Winsxs folder']=WinsxsSize_d,['Memory DMP file']=MemoryDMPSize_d,['Minidump']=minidumpSize_d,['Crashdump files']=CrashdumpsSize_d,['Kernel report foler']=KernelReportsSize_d,SoftwareDistribution=SoftwareDistributionSize_d,['Windows.old']=WindowsOldSize_d,['Windows logs']=WindowsLogsSize_d,ccmcache=ccmcacheSize_d",
+              "size": 0,
+              "title": "Details about content that take space",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Disk freespace",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "ProgramData",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Windows temp",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Winsxs folder",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Memory DMP file",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Minidump",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Crashdump files",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Kernel report foler",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "SoftwareDistribution",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Windows.old",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Windows logs",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "ccmcache",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ],
+                "filter": true,
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_number_Winsxs folder_6",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_number_Winsxs folder_6",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "LowDiskSpace"
+            },
+            "name": "query - 6",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(Top10CFoldersText_s)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Folders=Top10CFoldersText_s\r\n",
+              "size": 0,
+              "title": "Larger folders in C:\\ for devices with < than {FreeDiskSizeLimit}% free space",
+              "timeContextFromParameter": "TimeRange",
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000,
+                "filter": true
+              }
+            },
+            "name": "query - 13",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where isnotempty(Top10ProgramDataFoldersText_s)\r\n| where HardDiskFreeSpacePercent_d < {FreeDiskSizeLimit}\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Computer=DeviceName_s, Folders=Top10ProgramDataFoldersText_s\r\n",
+              "size": 0,
+              "title": "Larger folders in ProgramData",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 5",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "LowDiskSpace"
+        },
+        {
+          "parameterName": "SelectedTab2",
+          "comparison": "isEqualTo",
+          "value": "SystemSide"
+        }
+      ],
+      "name": "SyetemContentGroup",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "**This part allows you to easily analyze disk size on a specific device and see what's taking up place.\r\n<br>\r\nIt allows you to see how to free up disk space on the device.\r\n<br><br>\r\n!!! Please, type a device name in the filter above to get info about the device !!!**\r\n\r\n",
+        "style": "warning"
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isEqualTo",
+          "value": ""
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Remediate"
+        }
+      ],
+      "name": "text - 12",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "IntuneDevices\r\n| where DeviceName == \"{ComputerName}\"\r\n| summarize arg_max(TimeGenerated,*) by DeviceName\r\n| extend DeviceLastContact = make_datetime(LastContact)\r\n| extend DateFormat = format_datetime(DeviceLastContact,\"MM-dd-yyyy hh:mm\")\r\n| project ['Device last contact']=DateFormat,['Primary user']=UserName,Model=Model,Mail=UserEmail",
+              "size": 3,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 3",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(HardDiskFreeSpacePercent_d)\r\n| extend UserSizetoClean = todouble(coalesce(RecycleBinSize_d, 0.0)) \r\n                         + todouble(coalesce(DesktopSizeOnDiskMb_d, 0.0))  \r\n                         + todouble(coalesce(DocumentsSizeOnDiskMb_d, 0.0)) \r\n                         + todouble(coalesce(PicturesSizeOnDiskMb_d, 0.0))\r\n                         + todouble(coalesce(DownloadSize_d, 0.0)) \r\n                         + todouble(coalesce(UserTempSize_d, 0.0)) \r\n                         + todouble(coalesce(PSTTotalSize_d, 0.0)) \r\n| extend SystemSizeToClean = todouble(coalesce(WindowsTempSize_d, 0.0)) \r\n                           + todouble(coalesce(ccmcacheSize_d, 0.0))   \r\n                           + todouble(coalesce(WinsxsSize_d, 0.0)) \r\n                           + todouble(coalesce(WindowsLogsSize_d, 0.0)) \r\n                           + todouble(coalesce(MemoryDMPSize_d, 0.0)) \r\n                           + todouble(coalesce(minidumpSize_d, 0.0))\r\n                           + todouble(coalesce(KernelReportsSize_d, 0.0)) \r\n                           + todouble(coalesce(CrashdumpsSize_d, 0.0))  \r\n                           + todouble(coalesce(SoftwareDistributionSize_d, 0.0)) \r\n                           + todouble(coalesce(WindowsOldSize_d, 0.0))                 \r\n| extend TotalSizeToClean = UserSizetoClean + SystemSizeToClean \r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| order by TotalSizeToClean\r\n| project DeviceName_s,\r\n          Metric = pack_array(\r\n              pack(\"Name\",\"Free disk space\",\"Value\", DiskFreeSpaceFormated_s),\r\n              pack(\"Name\",\"Disk full size\",\"Value\", DiskFullSizeFormated_s),\r\n              pack(\"Name\",\"Size to clean\",\"Value\", tostring(TotalSizeToClean)),\r\n              pack(\"Name\",\"User content to purge\",\"Value\", tostring(UserSizetoClean)),\r\n              pack(\"Name\",\"System content to clean\",\"Value\", tostring(SystemSizeToClean))\r\n          )\r\n| mv-expand Metric\r\n| project Info=Metric.Name, Value=Metric.Value\r\n",
+              "size": 3,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Value",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Size to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "User content to purge",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "System content to clean",
+                    "formatter": 0,
+                    "numberFormat": {
+                      "unit": 2,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "query - 4",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(HardDiskFreeSpacePercent_d)             \r\n| project Metric = pack_array(\r\n              pack(\"Name\",\"Desktop path\",\"Value\", DesktopPath_s),\r\n              pack(\"Name\",\"Documents path\",\"Value\", DocumentsPath_s),\r\n              pack(\"Name\",\"Pictures path\",\"Value\", PicturesPath_s)\r\n          )\r\n| mv-expand Metric\r\n| project Folder=Metric.Name, Path=Metric.Value\r\n",
+              "size": 3,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 5",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(OneDriveSizeOnDiskFormated_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| project Date=TimeGenerated,\r\n          Metric = pack_array(\r\n              pack(\"Name\",\"OneDrive size on disk\",\"Value\", OneDriveSizeOnDiskFormated_s),\r\n              pack(\"Name\",\"Desktop size on disk\",\"Value\", DesktopSizeOnDiskFormated_s),\r\n              pack(\"Name\",\"Documents size on disk\",\"Value\", DocumentsSizeOnDiskFormated_s),\r\n              pack(\"Name\",\"Pictures size on disk\",\"Value\", PicturesSizeOnDiskFormated_s),\r\n              pack(\"Name\",\"Downloads size\",\"Value\", DownloadSizeFormated_s),\r\n              pack(\"Name\",\"User temp\",\"Value\", UserTempSizeFormated_s),\r\n              pack(\"Name\",\"Recycle bin size\",\"Value\", RecycleBinSizeFormated_s),\r\n              pack(\"Name\",\"PST total size\",\"Value\", PSTTotalSizeFormated_s),\r\n              pack(\"Name\",\"ProgramData size\",\"Value\", ProgramDataSizeFormated_s),\r\n              pack(\"Name\",\"Windows Temp size\",\"Value\", WindowsTempSizeFormated_s),\r\n              pack(\"Name\",\"Kernel reports size\",\"Value\", KernelReportsSizeFormated_s),\r\n              pack(\"Name\",\"Memory DMP size\",\"Value\", MemoryDMPSizeFormated_s),\r\n              pack(\"Name\",\"Minidump size\",\"Value\", MinidumpSizeFormated_s),\r\n              pack(\"Name\",\"Crashdumps size\",\"Value\", CrashdumpsSizeFormated_s),\r\n              pack(\"Name\",\"Winsxs size\",\"Value\", WinsxsSizeFormated_s),\r\n              pack(\"Name\",\"SoftwareDistribution size\",\"Value\", SoftwareDistribSizeFormated_s),\r\n              pack(\"Name\",\"Windows.Old size\",\"Value\", WindowsOldSizeFormated_s),\r\n              pack(\"Name\",\"Windows Logs size\",\"Value\", WindowsLogs_SizeFormated_s),\r\n              pack(\"Name\",\"CCMCache size\",\"Value\", ccmcacheSizeFormated_s)\r\n          )\r\n| mv-expand Metric\r\n| project Info=Metric.Name, Size=Metric.Value",
+              "size": 3,
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 6",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(Top10ODFoldersArray_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| project Top10ODFoldersArray_s\r\n| extend Parsed = parse_json(Top10ODFoldersArray_s)\r\n| mv-expand Parsed\r\n| extend \r\n    Path = tostring(Parsed.Path),\r\n    SizeOnDisk = tolong(Parsed.FullSize),\r\n    FormatedSize = tostring(Parsed.Size)\r\n| where isnotempty(SizeOnDisk)\r\n| top 10 by SizeOnDisk\r\n| project Path, ['Size on disk']=FormatedSize",
+              "size": 3,
+              "title": "Larger folders at OneDrive root",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 0",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(TopUsersFoldersArray_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| project TopUsersFoldersArray_s\r\n| extend Parsed = parse_json(TopUsersFoldersArray_s)\r\n| mv-expand Parsed\r\n| extend \r\n    Path = tostring(Parsed.Path),\r\n    SizeOnDisk = tolong(Parsed.FullSize),\r\n    FormatedSize = tostring(Parsed.Size)\r\n| where isnotempty(SizeOnDisk)\r\n| top 10 by SizeOnDisk\r\n| project Path, ['Size on disk']=FormatedSize",
+              "size": 3,
+              "title": "Larger folders in C:\\Users",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 1",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(Top10CFoldersArray_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| project Top10CFoldersArray_s\r\n| extend Parsed = parse_json(Top10CFoldersArray_s)\r\n| mv-expand Parsed\r\n| extend \r\n    Path = tostring(Parsed.Path),\r\n    SizeOnDisk = tolong(Parsed.FullSize),\r\n    FormatedSize = tostring(Parsed.Size)\r\n| where isnotempty(SizeOnDisk)\r\n| top 10 by SizeOnDisk\r\n| project Path, ['Size on disk']=FormatedSize",
+              "size": 3,
+              "title": "Larger folders at C: root",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 2",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "DiskSize_CL\r\n| where DeviceName_s == \"{ComputerName:escape}\"\r\n| where isnotempty(Top10ProgramDataFoldersArray_s)\r\n| summarize arg_max(TimeGenerated,*) by DeviceName_s\r\n| project Top10ProgramDataFoldersArray_s\r\n| extend Parsed = parse_json(Top10ProgramDataFoldersArray_s)\r\n| mv-expand Parsed\r\n| extend \r\n    Path = tostring(Parsed.Path),\r\n    SizeOnDisk = tolong(Parsed.FullSize),\r\n    FormatedSize = tostring(Parsed.Size)\r\n| where isnotempty(SizeOnDisk)\r\n| top 10 by SizeOnDisk\r\n| project Path, ['Size on disk']=FormatedSize",
+              "size": 3,
+              "title": "Larger folders in ProgramData",
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "query - 7",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo",
+          "value": ""
+        },
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Remediate"
+        }
+      ],
+      "name": "remediate"
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
