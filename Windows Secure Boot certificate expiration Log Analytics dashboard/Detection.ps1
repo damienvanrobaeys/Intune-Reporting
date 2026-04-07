@@ -1,8 +1,8 @@
 #************************************************************************************************************************
 # 												Part to fill
 #************************************************************************************************************************
-$CustomerId = "7a3c2110-2a68-45a0-aff1-0e7b3cecd801" # Log Analytics Workspace ID
-$SharedKey = 'Xj7/qbO8xat8jZVNGZdO2SO3Ghw38xRtYVljTCMioGrvIxu09N5DyEi+U9fQAD0kRA3nTfnxUM1uNgOPoLNYTg==' # Log Analytics Workspace Primary Key
+$CustomerId = "" # Log Analytics Workspace ID
+$SharedKey = '' # Log Analytics Workspace Primary Key
 $LogType = "SecureBoot_Certificate_CL" # Custom log to create in lo Analytics
 $TimeStampField = "" # let to blank
 #************************************************************************************************************************
