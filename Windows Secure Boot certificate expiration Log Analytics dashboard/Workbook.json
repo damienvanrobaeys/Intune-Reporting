@@ -1,0 +1,722 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n//| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| summarize Total = count()\r\n| extend Result = strcat(Total, \" devices\")\r\n| project Result",
+              "size": 3,
+              "title": "💻 Devices count ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "15",
+            "name": "query - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| summarize Total = count(),UpToDate = countif(CertActiveDB_b == \"True\" and UEFICA2023Status_s == \"Updated\" and IsSecureBootEnabled_b == \"True\" and WindowsUEFICA2023Capable_d == 2)\r\n| extend Percentage = round(UpToDate * 100.0 / Total, 2)\r\n| extend Result = strcat( Percentage, \"% devices\")\r\n| project Result",
+              "size": 3,
+              "title": "✅ Devices UpToDate",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "15",
+            "name": "query - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertDefaultDB_b)\r\n| where Manufacturer_s !contains \"Microsoft\"\r\n| summarize Total = count(),UpToDate = countif(CertDefaultDB_b == \"True\")\r\n| extend Percentage = round(UpToDate * 100.0 / Total, 2)\r\n| extend Result = strcat( Percentage, \"% devices\")\r\n| project Result",
+              "size": 3,
+              "title": "🚀 Minimum BIOS uptodate ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "20",
+            "name": "query - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| where isnotempty(Manufacturer_s)\r\n| where Manufacturer_s !contains \"OEMCT\"\r\n| summarize arg_max(TimeGenerated, *) by Manufacturer_s\r\n| summarize Total = count()\r\n| extend Result = strcat( Total, \" manufacturer(s)\")\r\n| project Result",
+              "size": 3,
+              "title": "👷🏼‍♂️ Manufacturer count",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 3"
+          }
+        ]
+      },
+      "name": "group_info3"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "b4d65360-1983-41d9-9649-e0f84a624476",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Overview",
+            "subTarget": "Overview",
+            "style": "link"
+          },
+          {
+            "id": "4af8f0fe-8ad4-4c3c-88cd-2227cc39a253",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Details",
+            "subTarget": "Details",
+            "style": "link"
+          },
+          {
+            "id": "bb8d2f02-ce92-4383-b10a-99979c366b4e",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "How does it work ?",
+            "subTarget": "Process",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 7"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| extend UpToDate_Devices = UEFICA2023Status_s == \"Updated\" and WindowsUEFICA2023Capable_d == 2\r\n| summarize SecureBoot_Certificate_CL = count() by tostring(UpToDate_Devices)",
+              "size": 4,
+              "title": "Secure Boot certificate global status",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "With issue",
+                    "label": "Needs update",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "Without issue",
+                    "label": "Uptodate",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "False",
+                    "label": "Needs update",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "True",
+                    "label": "Uptodate",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 3",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertDefaultDB_b)\r\n| where Manufacturer_s !contains \"Microsoft\"\r\n| summarize SecureBoot_Certificate_CL = count() by tostring(CertDefaultDB_b)",
+              "size": 4,
+              "title": "BIOS minimum update status for certificate ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false
+              },
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "True",
+                    "label": "OK",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "False",
+                    "label": "Needs update",
+                    "color": "redBright"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 2",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertActiveDB_b)\r\n| summarize SecureBoot_Certificate_CL = count() by tostring(CertActiveDB_b)\r\n",
+              "size": 4,
+              "title": "Certificate found in ActiveDB",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "True",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "False",
+                    "color": "redBright"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 1",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Overview"
+      },
+      "name": "group _info2"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(IsSecureBootEnabled_b)\r\n| summarize Count = count() by tostring(IsSecureBootEnabled_b)",
+              "size": 4,
+              "title": "Secure Boot status",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "True",
+                    "label": "Enabled",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "False",
+                    "label": "Disabled",
+                    "color": "redBright"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 7",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(SecureBootTaskStatus_s)\r\n| summarize SecureBoot_Certificate_CL = count() by tostring(SecureBootTaskStatus_s)\r\n",
+              "size": 4,
+              "title": "Secure Boot update scheduled task status",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Enabled",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "Not found",
+                    "color": "redBright"
+                  }
+                ]
+              }
+            },
+            "customWidth": "30",
+            "name": "query - 4",
+            "styleSettings": {
+              "maxWidth": "30",
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(UEFICA2023Status_s)\r\n| summarize SecureBoot_Certificate_CL = count() by tostring(UEFICA2023Status_s)\r\n",
+              "size": 4,
+              "title": "UEFICA2023 cert deployment status ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "NotStarted",
+                    "label": "Not started",
+                    "color": "redBright",
+                    "comment": ""
+                  },
+                  {
+                    "seriesName": "Updated",
+                    "label": "Uptodate",
+                    "color": "green",
+                    "comment": ""
+                  },
+                  {
+                    "seriesName": "InProgress",
+                    "label": "In progress",
+                    "color": "orange",
+                    "comment": ""
+                  }
+                ]
+              }
+            },
+            "customWidth": "40",
+            "name": "query - 5",
+            "styleSettings": {
+              "maxWidth": "40",
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Overview"
+      },
+      "name": "group_overview2"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(Manufacturer_s)\r\n| where Manufacturer_s !contains \"OEMCT\"\r\n| where CertDefaultDB_b == \"False\"\r\n| summarize ['Devices count'] = count() by ['Manufacturer']=Manufacturer_s,Model=ModelFriendlyName_s\r\n| order by ['Devices count']\r\n\r\n\r\n",
+              "size": 1,
+              "title": "❌ Models requiring BIOS update",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 7",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(Manufacturer_s)\r\n| where Manufacturer_s !contains \"OEMCT\"\r\n| where CertDefaultDB_b == \"True\"\r\n| summarize ['Devices count'] = count() by ['Manufacturer']=Manufacturer_s,Model=ModelFriendlyName_s\r\n| order by ['Devices count']\r\n\r\n\r\n",
+              "size": 1,
+              "title": "✔️ Models with BIOS uptodate",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 8",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Overview"
+      },
+      "name": "group_BIOS_Models"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(Manufacturer_s)\r\n| where Manufacturer_s !contains \"OEMCT\"\r\n| where CertActiveDB_b == \"False\"\r\n| summarize ['Devices count'] = count() by ['Manufacturer']=Manufacturer_s,Model=ModelFriendlyName_s\r\n| order by ['Devices count']\r\n\r\n\r\n",
+              "size": 1,
+              "title": "❌ Models requiring certificate update",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 0",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(Manufacturer_s)\r\n| where Manufacturer_s !contains \"OEMCT\"\r\n| where CertActiveDB_b == \"True\"\r\n| summarize ['Devices count'] = count() by ['Manufacturer']=Manufacturer_s,Model=ModelFriendlyName_s\r\n| order by ['Devices count']\r\n\r\n\r\n",
+              "size": 1,
+              "title": "✔️ Models with certificate uptodate",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "customWidth": "50",
+            "name": "query - 1",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Overview"
+      },
+      "name": "Models_Certificate"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "163dad6b-bc58-4fe8-9cfe-14ef9a4dcf17",
+            "version": "KqlParameterItem/1.0",
+            "name": "ComputerName",
+            "label": "Filter on device name",
+            "type": 1,
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "parameters - 8"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices with certificate not ready",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "3398196a-4f99-44fd-ba45-99d275c98839",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "UEFICA2023Status",
+                  "label": "Deployment status",
+                  "type": 2,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\":\"NotStarted\", \"label\":\"Not started\", \"selected\":true },\r\n    { \"value\":\"InProgress\", \"label\":\"In progress\", \"selected\":true }\r\n    ]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "parameters - 1"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "Here we check the registry key UEFICA2023Status located in \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\Servicing\".\r\n<br><br>\r\nThe \"Deployment status\" corresponding to \"UEFICA2023Status\" has 3 values:\r\n- Updated: The Secure Boot CA 2023 update complete. No action needed on your side.\r\n- InProgress: The update is actively in progress. Waiting for a reboot or scheduled task execution.\r\n- NoStarted: The deployment is planned, but the update has not yet run.\r\n\r\n\r\n",
+              "style": "upsell"
+            },
+            "name": "text - 2",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| where UEFICA2023Status_s contains \"{UEFICA2023Status}\"\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where UEFICA2023Status_s <> \"Updated\" \r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Deployment status']=UEFICA2023Status_s,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,CertActiveDB_b,WindowsUEFICA2023Capable=WindowsUEFICA2023Capable_d,LatestEventId_d",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "query - 7",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "Certificate_not_ready_devices",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "Devices with BIOS to update",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "Here we check the value from the below command:\r\n(Get-SecureBootUEFI dbdefault).bytes\r\n<br><br>\r\nThe return of this command has 2 values:\r\n- True: uptodate\r\n- False: not uptodate\r\n\r\n",
+              "style": "upsell"
+            },
+            "name": "text - 0",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertDefaultDB_b)\r\n| where Manufacturer_s !contains \"Microsoft\"\r\n| where CertDefaultDB_b == \"False\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,SN=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,['BIOS version']=BIOSVersion_s,['BIOS date']=BIOSReleaseDate_t,CertActiveDB_b,['Deployment status']=UEFICA2023Status_s,['Deployment status info']=UEFICA2023Status_Label_s\r\n",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "Details"
+            },
+            "name": "query - 8",
+            "styleSettings": {
+              "showBorder": true
+            }
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "group_list_bios_notuptodate",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(IsSecureBootEnabled_b)\r\n| where IsSecureBootEnabled_b == \"False\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,SN=SerialNumber_s,Mzanufacturer=Manufacturer_s,Model=ModelFriendlyName_s,['Cert deployment status']=UEFICA2023Status_s,['Cert deployment status label']=UEFICA2023Status_Label_s\r\n",
+        "size": 0,
+        "title": "Devices with Secure Boot disabled",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 9",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project DeviceName_s,SerialNumber_s,IsSecureBootEnabled_b,Model_s,ModelFriendlyName_s,CertActiveDB_b,CertDefaultDB_b,Manufacturer_s,BIOSVersion_s,UEFICA2023Status_s,WindowsUEFICA2023Capable_d,UEFICA2023Status_Label_s,LatestEventId_d,RebootPending_b,BIOSReleaseDate_t,BIOSReleaseDateDaysOld_d,SMBIOSBIOSVersion_s,OS_Build_s,OSInstallDate_t,OSVersion_s,DeviceUptime_t,AvailableUpdates_Convert_Hex_s,MicrosoftUpdateManagedOptIn_Value_d,HighConfidenceOptOut_Value_d,Event1795Count_d,Event1796Count_d,Event1800Count_d,Event1801Count_d,Event1802Count_d,Event1803Count_d,Event1808Count_d,MissingKEK_b\r\n",
+        "size": 0,
+        "title": "All devices details",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "rowLimit": 10000
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Details"
+      },
+      "name": "query - 10",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "The data is collected and sent through an Intune remediation script.\r\n<br>\r\nThe remediation script is executed every day.\r\n\r\n**Certificate state**\r\n<br>\r\nHere we check the deployment status of the certificate using the below registry key:\r\nHKLM\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\Servicing\\UEFICA2023Status\r\n\r\n\r\n\r\n**BIOS check**\r\n<br>\r\nIn this part, we check the result of the following command:\r\n([System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI dbdefault).bytes) -match 'Windows UEFI CA 2023')\r\n<br>\r\nThis command allows you to check if the dbdefault contains the \"Windows UEFI CA 2023\" cert.\r\n<br><br>\r\nIt can be True or False:\r\n- True: the device has the minimum BIOS version that \r\n- False: the device does not have the minimum BIOS version\r\n\r\n\r\n\r\n**Secure boot status**\r\n<br>\r\nIn this part, we check devices with secure boot enabled or not.\r\n<br>\r\nSecure boot is a prerequisite for the certificate update.\r\n\r\n\r\n\r\n**Secure boot scheduled task**\r\n<br>\r\nIn this part, we check the status of the \"Secure-Boot-Update\" scheduled task.\r\n\r\n\r\n\r\n**Event logs**\r\n<br>\r\nIn this part, we check event IDs in the System event log.\r\n<br>\r\n- 1801: Update initiated, reboot required\r\n<br>\r\n- 1808: Update completed successfully\r\n<br>\r\n- 1795: Firmware returned error\r\n<br>\r\n- 1796: Error logged with error code\r\n<br>\r\n- 1800: Reboot needed\r\n<br>\r\n- 1802: Known firmware issue blocked update\r\n<br>\r\n- 1803: Matching KEK update not found",
+        "style": "upsell"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Process"
+      },
+      "name": "text - 11",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
