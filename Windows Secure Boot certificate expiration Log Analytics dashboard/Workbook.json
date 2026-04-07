@@ -64,8 +64,28 @@
                 "style": "bignumber"
               }
             },
-            "customWidth": "20",
+            "customWidth": "15",
             "name": "query - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| summarize Total = count(),UpToDate = countif(LatestEventId_d == 1800 and BootUptimeDays_d >= 7 and UEFICA2023Status_s == \"InProgress\" )\r\n| extend Percentage = round(UpToDate * 100.0 / Total, 2)\r\n| extend Result = strcat( Percentage, \"% devices\")\r\n| project Result",
+              "size": 3,
+              "title": "⏳ Devices waiting for  a reboot",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "15",
+            "name": "query - 4"
           },
           {
             "type": 3,
@@ -541,7 +561,8 @@
                   "jsonData": "[\r\n    { \"value\":\"NotStarted\", \"label\":\"Not started\", \"selected\":true },\r\n    { \"value\":\"InProgress\", \"label\":\"In progress\", \"selected\":true }\r\n    ]",
                   "timeContext": {
                     "durationMs": 86400000
-                  }
+                  },
+                  "value": "InProgress"
                 }
               ],
               "style": "pills",
@@ -565,7 +586,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "SecureBoot_Certificate_CL\r\n| where UEFICA2023Status_s contains \"{UEFICA2023Status}\"\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where UEFICA2023Status_s <> \"Updated\" \r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Deployment status']=UEFICA2023Status_s,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,CertActiveDB_b,WindowsUEFICA2023Capable=WindowsUEFICA2023Capable_d,LatestEventId_d",
+              "query": "SecureBoot_Certificate_CL\r\n| where UEFICA2023Status_s contains \"{UEFICA2023Status}\"\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where UEFICA2023Status_s <> \"Updated\" \r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Deployment status']=UEFICA2023Status_s,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,CertActiveDB_b,WindowsUEFICA2023Capable=WindowsUEFICA2023Capable_d,LatestEventId_d,['Last reboot']=DeviceUptime_t,['Last reboot in days']=BootUptimeDays_d",
               "size": 0,
               "timeContext": {
                 "durationMs": 86400000
@@ -574,10 +595,56 @@
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Last reboot in days",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": ">=",
+                          "thresholdValue": "7",
+                          "representation": "2",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
                 "rowLimit": 10000
               }
             },
             "name": "query - 7",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where LatestEventId_d == 1800 and BootUptimeDays_d >= 7 and UEFICA2023Status_s == \"InProgress\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Deployment status']=UEFICA2023Status_s,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,CertActiveDB_b,WindowsUEFICA2023Capable=WindowsUEFICA2023Capable_d,LatestEventId_d,['Last reboot']=DeviceUptime_t,['Last reboot in days']=BootUptimeDays_d\r\n//| count",
+              "size": 0,
+              "title": "Devices waiting for a reboot",
+              "noDataMessage": " ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "query - 3",
             "styleSettings": {
               "showBorder": true
             }
