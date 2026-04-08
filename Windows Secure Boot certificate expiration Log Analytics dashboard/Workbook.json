@@ -11,7 +11,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "SecureBoot_Certificate_CL\r\n//| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| summarize Total = count()\r\n| extend Result = strcat(Total, \" devices\")\r\n| project Result",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by DeviceName_s\r\n| summarize Total = count()\r\n| extend Result = strcat(Total, \" devices\")\r\n| project Result",
               "size": 3,
               "title": "💻 Devices count ",
               "timeContext": {
@@ -44,28 +44,8 @@
                 "style": "bignumber"
               }
             },
-            "customWidth": "15",
+            "customWidth": "17",
             "name": "query - 1"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertDefaultDB_b)\r\n| where Manufacturer_s !contains \"Microsoft\"\r\n| summarize Total = count(),UpToDate = countif(CertDefaultDB_b == \"True\")\r\n| extend Percentage = round(UpToDate * 100.0 / Total, 2)\r\n| extend Result = strcat( Percentage, \"% devices\")\r\n| project Result",
-              "size": 3,
-              "title": "🚀 Minimum BIOS uptodate ",
-              "timeContext": {
-                "durationMs": 2592000000
-              },
-              "queryType": 0,
-              "resourceType": "microsoft.operationalinsights/workspaces",
-              "visualization": "card",
-              "textSettings": {
-                "style": "bignumber"
-              }
-            },
-            "customWidth": "15",
-            "name": "query - 2"
           },
           {
             "type": 3,
@@ -84,8 +64,28 @@
                 "style": "bignumber"
               }
             },
-            "customWidth": "15",
+            "customWidth": "17",
             "name": "query - 4"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where isnotempty(CertDefaultDB_b)\r\n| where Manufacturer_s !contains \"Microsoft\"\r\n| summarize Total = count(),UpToDate = countif(CertDefaultDB_b == \"True\")\r\n| extend Percentage = round(UpToDate * 100.0 / Total, 2)\r\n| extend Result = strcat( Percentage, \"% devices\")\r\n| project Result",
+              "size": 3,
+              "title": "🚀 Minimum BIOS uptodate ",
+              "timeContext": {
+                "durationMs": 2592000000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "card",
+              "textSettings": {
+                "style": "bignumber"
+              }
+            },
+            "customWidth": "20",
+            "name": "query - 2"
           },
           {
             "type": 3,
@@ -574,7 +574,7 @@
           {
             "type": 1,
             "content": {
-              "json": "Here we check the registry key UEFICA2023Status located in \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\Servicing\".\r\n<br><br>\r\nThe \"Deployment status\" corresponding to \"UEFICA2023Status\" has 3 values:\r\n- Updated: The Secure Boot CA 2023 update complete. No action needed on your side.\r\n- InProgress: The update is actively in progress. Waiting for a reboot or scheduled task execution.\r\n- NoStarted: The deployment is planned, but the update has not yet run.\r\n\r\n\r\n",
+              "json": "Here we check the registry key UEFICA2023Status located in \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\Servicing\".\r\n<br><br>\r\nThe \"Deployment status\" corresponding to \"UEFICA2023Status\" has 3 values:\r\n- Updated: The Secure Boot CA 2023 update complete. No action needed on your side.\r\n- InProgress: The update is actively in progress. Waiting for a reboot or scheduled task execution.\r\n- NoStarted: The deployment is planned, but the update has not yet run.\r\n<br><br>\r\n\r\n\r\n**Devices waiting for a reboot**\r\n<br><br>\r\nHere we check devices where:\r\n- UEFICA2023Status_s == \"InProgress\"\r\n<br>\r\n- LatestEventId_d == 1800 \r\n<br>\r\n- BootUptimeDays_d >= 7 \r\n\r\n\r\n\r\n\r\n\r\n",
               "style": "upsell"
             },
             "name": "text - 2",
@@ -630,9 +630,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where LatestEventId_d == 1800 and BootUptimeDays_d >= 7 and UEFICA2023Status_s == \"InProgress\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project Device=DeviceName_s,['Deployment status']=UEFICA2023Status_s,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s,CertActiveDB_b,WindowsUEFICA2023Capable=WindowsUEFICA2023Capable_d,LatestEventId_d,['Last reboot']=DeviceUptime_t,['Last reboot in days']=BootUptimeDays_d\r\n//| count",
+              "query": "SecureBoot_Certificate_CL\r\n| summarize arg_max(TimeGenerated, *) by SerialNumber_s\r\n| where IsSecureBootEnabled_b == \"True\"\r\n| where LatestEventId_d == 1800 and BootUptimeDays_d >= 7 and UEFICA2023Status_s == \"InProgress\"\r\n| where \"{ComputerName:escape}\" == \"*\" or DeviceName_s contains \"{ComputerName:escape}\" or \"{ComputerName:escape}\" == \"All devices\"\r\n| project ['Last contact']=TimeGenerated,Device=DeviceName_s,['Last reboot']=DeviceUptime_t,['Last reboot in days']=BootUptimeDays_d,SerialNumber=SerialNumber_s,Manufacturer=Manufacturer_s,Model=ModelFriendlyName_s\r\n//| count",
               "size": 0,
-              "title": "Devices waiting for a reboot",
+              "title": "Devices waiting for a reboot (where last reboot > 7 days)",
               "noDataMessage": " ",
               "timeContext": {
                 "durationMs": 2592000000
