@@ -7,7 +7,6 @@ $LogType = "SecureBoot_Certificate_CL" # Custom log to create in lo Analytics
 $TimeStampField = "" # let to blank
 #************************************************************************************************************************
 
-
 # Log analytics functions
 Function Build-Signature ($customerId, $sharedKey, $date, $contentLength, $method, $contentType, $resource)
 {
@@ -95,8 +94,12 @@ $SMBIOSBIOSVersion = $Win32_BIOS.SMBIOSBIOSVersion
 
 # 7. Get BIOS release date
 $BIOS_Release_Date = $BIOS_Info.ReleaseDate	
-$ReleaseDate_Days_Old = ($Current_Date - $BIOS_Release_Date)
-$BIOS_ReleaseDate_Days_Old = $ReleaseDate_Days_Old.Days
+If($null -ne $BIOS_Release_Date){
+    $ReleaseDate_Days_Old = ($Current_Date - $BIOS_Release_Date)
+    $BIOS_ReleaseDate_Days_Old = $ReleaseDate_Days_Old.Days
+}Else{
+    $BIOS_ReleaseDate_Days_Old = $null
+}
 
 # 8. Get OS Version
 Try{
@@ -134,10 +137,10 @@ Try {
 $Cert_ActiveDB = ([System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI db).bytes) -match 'Windows UEFI CA 2023')
 
 # 13. Check certificate in DefaultDB
-$Cert_DefaultDB = ([System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI dbdefault).bytes) -match 'Windows UEFI CA 2023')
-If($Cert_DefaultDB -eq $null)
-{
-	$Cert_DefaultDB = "Check firmware"
+Try{
+    $Cert_DefaultDB = ([System.Text.Encoding]::ASCII.GetString((Get-SecureBootUEFI dbdefault).bytes) -match 'Windows UEFI CA 2023')
+}Catch{
+    $Cert_DefaultDB = "Check firmware"
 }
 
 # 14. Check HighConfidenceOptOut registry value: should be 0
