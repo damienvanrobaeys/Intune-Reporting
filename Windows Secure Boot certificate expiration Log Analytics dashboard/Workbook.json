@@ -85,6 +85,11 @@
               }
             },
             "customWidth": "20",
+            "conditionalVisibility": {
+              "parameterName": "CertDefaultDB_b",
+              "comparison": "isNotEqualTo",
+              "value": "\"\""
+            },
             "name": "query - 2"
           },
           {
@@ -223,11 +228,21 @@
                     "seriesName": "False",
                     "label": "Needs update",
                     "color": "redBright"
+                  },
+                  {
+                    "seriesName": "Check firmware",
+                    "label": "No info",
+                    "color": "orange"
                   }
                 ]
               }
             },
             "customWidth": "30",
+            "conditionalVisibility": {
+              "parameterName": "CertDefaultDB_b",
+              "comparison": "isNotEqualTo",
+              "value": "\"\""
+            },
             "name": "query - 2",
             "styleSettings": {
               "maxWidth": "30",
@@ -261,6 +276,11 @@
               }
             },
             "customWidth": "30",
+            "conditionalVisibility": {
+              "parameterName": "CertActiveDB_b",
+              "comparison": "isNotEqualTo",
+              "value": "\"\""
+            },
             "name": "query - 1",
             "styleSettings": {
               "maxWidth": "30",
@@ -448,11 +468,18 @@
           }
         ]
       },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "Overview"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Overview"
+        },
+        {
+          "parameterName": "CertDefaultDB_b",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        }
+      ],
       "name": "group_BIOS_Models"
     },
     {
@@ -756,11 +783,18 @@
           }
         ]
       },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "Details"
-      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Details"
+        },
+        {
+          "parameterName": "CertDefaultDB_b",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        }
+      ],
       "name": "group_list_bios_notuptodate",
       "styleSettings": {
         "showBorder": true
