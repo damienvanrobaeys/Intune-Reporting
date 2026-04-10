@@ -143,6 +143,17 @@ Try{
     $Cert_DefaultDB = "Check firmware"
 }
 
+If($Cert_DefaultDB -eq $True)
+{
+	$Cert_DefaultDB_Status = "OK"
+}ElseIf($Cert_DefaultDB -eq $False)
+{
+	$Cert_DefaultDB_Status = "Needs update"
+}ElseIf($Cert_DefaultDB -eq "Check firmware")
+{
+	$Cert_DefaultDB_Status = "Check firmware"
+}
+
 # 14. Check HighConfidenceOptOut registry value: should be 0
 Try{
 	$HighConfidenceOptOut_Value = (Get-ItemProperty -Path $SecureBoot_Root_Path -Name "HighConfidenceOptOut" -ErrorAction SilentlyContinue).HighConfidenceOptOut
@@ -444,6 +455,7 @@ $Properties = [ordered]@{
     IsSecureBootEnabled           			= $Is_SecureBoot_Enabled
     CertActiveDB           					= $Cert_ActiveDB
     CertDefaultDB           				= $Cert_DefaultDB
+    CertDefaultDBStatus           			= $Cert_DefaultDB_Status
     HighConfidenceOptOut_Value           	= $HighConfidenceOptOut_Value
     MicrosoftUpdateManagedOptIn_Value       = $MicrosoftUpdateManagedOptIn_Value
     AvailableUpdates_Value           		= $AvailableUpdates_Value
